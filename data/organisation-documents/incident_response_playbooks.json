@@ -1,0 +1,126 @@
+{
+  "incident_response_playbooks": [
+    {
+      "playbook_id": "PB-MAL-001",
+      "playbook_name": "Malware Outbreak / C2 Communication",
+      "incident_type": "Malware Command & Control",
+      "severity_criteria": {
+        "Critical": "Confirmed C2 on a critical server (Domain Controller, Core App Server).",
+        "High": "Confirmed C2 on multiple workstations or a single high-value user workstation (e.g., Finance, HR).",
+        "Medium": "Confirmed C2 on a single standard user workstation."
+      },
+      "containment_steps": [
+        { "step": 1, "action": "Isolate the infected host(s) from the network using the EDR agent's network containment feature." },
+        { "step": 2, "action": "Block the malicious C2 IP address and domain at the edge firewall and web proxy." },
+        { "step": 3, "action": "If host cannot be isolated via EDR, contact the Network Team to shut down the switch port." },
+        { "step": 4, "action": "Reset the password for the user account associated with the infected host." },
+        { "step": 5, "action": "Search EDR, DNS, and proxy logs for the C2 indicators to identify other potentially infected hosts." }
+      ],
+      "eradication_steps": [
+        { "step": 1, "action": "Acquire a memory dump and disk image of the infected host for forensic analysis." },
+        { "step": 2, "action": "Re-image the infected host from a known-good corporate image. Do not attempt to 'clean' the malware." },
+        { "step": 3, "action": "Submit the malware hash and C2 indicators to relevant security tools (AV, EDR, threat intel platform)." }
+      ],
+      "recovery_steps": [
+        { "step": 1, "action": "Monitor the re-imaged host for any signs of reinfection." },
+        { "step": 2, "action": "Restore user data from a clean backup if necessary." },
+        { "step": 3, "action": "Communicate with the user about the incident and provide security awareness reminders." }
+      ],
+      "escalation_contacts": "SOC Manager, IT Infrastructure Team, Threat Intelligence Team"
+    },
+    {
+      "playbook_id": "PB-RANSOM-001",
+      "playbook_name": "Ransomware Containment",
+      "incident_type": "Ransomware",
+      "severity_criteria": { "Critical": "Any detection of ransomware activity, especially on file servers or multiple hosts." },
+      "containment_steps": [
+        { "step": 1, "action": "IMMEDIATE: Isolate the file server and the source host(s) that initiated the encryption. Use network containment in EDR and/or shut down switch ports." },
+        { "step": 2, "action": "IMMEDIATE: Disable the user account(s) associated with the activity." },
+        { "step": 3, "action": "IMMEDIATE: Verify that backups are offline and isolated from the production network. Do not connect them." },
+        { "step": 4, "action": "Block any external C2 IPs associated with the ransomware strain if identified." }
+      ],
+      "eradication_steps": [
+        { "step": 1, "action": "Identify the ransomware strain by analyzing the ransom note and file extensions." },
+        { "step": 2, "action": "Forensically analyze the entry point to determine how the ransomware was deployed (e.g., phishing, RDP brute force)." },
+        { "step": 3, "action": "Re-image all affected systems. Do not trust any system that was on the same VLAN as the outbreak." }
+      ],
+      "recovery_steps": [
+        { "step": 1, "action": "Once the network is confirmed clean, begin restoring data from the isolated, verified-clean backups." },
+        { "step": 2, "action": "Force a password reset for all users in the organization as a precaution." },
+        { "step": 3, "action": "Conduct a post-incident review to identify and remediate the security gaps that allowed the incident." }
+      ],
+      "escalation_contacts": "SOC Manager, Director of IT, Legal Department, Cyber Insurance Provider"
+    },
+    {
+      "playbook_id": "PB-PHISH-001",
+      "playbook_name": "Phishing with Credential Compromise",
+      "incident_type": "Phishing / Account Takeover",
+      "severity_criteria": {
+        "High": "Evidence that a user's credentials were successfully submitted and the account was accessed by an attacker.",
+        "Medium": "User clicked a phishing link but no evidence of successful credential submission or login."
+      },
+      "containment_steps": [
+        { "step": 1, "action": "IMMEDIATE: Reset the password for the affected user account." },
+        { "step": 2, "action": "IMMEDIATE: Revoke all active sessions for the user (e.g., in Microsoft 365, VPN)." },
+        { "step": 3, "action": "Block the phishing domain/URL at the web proxy and email gateway." },
+        { "step": 4, "action": "Use the email gateway to search for and delete the same phishing email from all other user inboxes." }
+      ],
+      "eradication_steps": [
+        { "step": 1, "action": "Analyze the compromised mailbox for attacker activity: new forwarding rules, sent items, deleted items." },
+        { "step": 2, "action": "Scan the user's workstation for any malware that may have been delivered alongside the phishing link." },
+        { "step": 3, "action": "Review logs for any systems the compromised account may have accessed after the breach." }
+      ],
+      "recovery_steps": [
+        { "step": 1, "action": "Once secure, re-enable the user account and provide the new password." },
+        { "step": 2, "action": "Ensure Multi-Factor Authentication (MFA) is enabled on the account." },
+        { "step": 3, "action": "Assign the user mandatory phishing awareness training." }
+      ],
+      "escalation_contacts": "SOC Manager, Help Desk"
+    },
+    {
+      "playbook_id": "PB-EXFIL-001",
+      "playbook_name": "Potential Data Exfiltration",
+      "incident_type": "Data Exfiltration",
+      "severity_criteria": {
+        "Critical": "Large volume of data exfiltrated from a critical server or involving sensitive data (PII, Finance).",
+        "High": "Suspicious outbound connection using a known exfiltration technique (e.g., DNS Tunneling, ICMP Tunneling)."
+      },
+      "containment_steps": [
+        { "step": 1, "action": "Isolate the source host from the network." },
+        { "step": 2, "action": "Block the external destination IP/domain at the firewall." },
+        { "step": 3, "action": "Analyze firewall and proxy logs to quantify the amount of data transferred." }
+      ],
+      "eradication_steps": [
+        { "step": 1, "action": "Forensically analyze the host to identify the malware or tool used for exfiltration." },
+        { "step": 2, "action": "Attempt to identify the type of data that was exfiltrated by analyzing host and file server logs." }
+      ],
+      "recovery_steps": [
+        { "step": 1, "action": "Re-image the compromised host." },
+        { "step": 2, "action": "Implement firewall rules to block the exfiltration protocol used (e.g., deny outbound ICMP, restrict DNS queries)." }
+      ],
+      "escalation_contacts": "SOC Manager, Legal Department, Data Protection Officer (DPO)"
+    },
+    {
+      "playbook_id": "PB-RECON-001",
+      "playbook_name": "Unauthorized Scanning / Reconnaissance",
+      "incident_type": "Reconnaissance",
+      "severity_criteria": {
+        "High": "Internal-to-Internal scanning from a non-IT host (potential lateral movement).",
+        "Medium": "Sustained external scanning against a critical service.",
+        "Low": "Opportunistic external scanning."
+      },
+      "containment_steps": [
+        { "step": 1, "action": "For external scans, block the source IP address at the firewall." },
+        { "step": 2, "action": "For internal scans, isolate the source host immediately as it is likely compromised." }
+      ],
+      "eradication_steps": [
+        { "step": 1, "action": "Review firewall and WAF logs to confirm no exploit attempts were successful." },
+        { "step": 2, "action": "If internal, begin the Malware Outbreak (PB-MAL-001) playbook on the source host." }
+      ],
+      "recovery_steps": [
+        { "step": 1, "action": "Monitor for further scanning activity from the same IP block or internal host." }
+      ],
+      "escalation_contacts": "SOC Manager, Network Team"
+    }
+  ]
+}

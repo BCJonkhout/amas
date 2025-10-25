@@ -1,0 +1,158 @@
+{
+  "service_policy": [
+    {
+      "policy_id": "POL-001",
+      "port_protocol": "TCP/21",
+      "service_name": "FTP",
+      "description": "File Transfer Protocol (Unencrypted)",
+      "status": "Forbidden",
+      "authorized_use_case": "This protocol is unencrypted and poses a security risk. All use is forbidden both internally and externally. Use SFTP (TCP/22) or other secure file transfer methods instead.",
+      "authorized_source_zones": [ "None" ],
+      "authorized_destination_zones": [ "None" ],
+      "notes": "Any detection of this protocol should be treated as a high-priority security incident."
+    },
+    {
+      "policy_id": "POL-002",
+      "port_protocol": "TCP/22",
+      "service_name": "SSH / SFTP",
+      "description": "Secure Shell / Secure File Transfer Protocol",
+      "status": "Restricted",
+      "authorized_use_case": "For secure remote administration of Linux/Unix servers and network devices. SFTP is the approved method for secure file transfers.",
+      "authorized_source_zones": [ "VLAN-IT-Admin-Security" ],
+      "authorized_destination_zones": [ "VLAN-ServerFarm-Production", "VLAN-Development", "VLAN-DMZ" ],
+      "notes": "Password-based authentication is disabled. Key-based authentication is mandatory."
+    },
+    {
+      "policy_id": "POL-003",
+      "port_protocol": "TCP/25",
+      "service_name": "SMTP",
+      "description": "Simple Mail Transfer Protocol",
+      "status": "Restricted",
+      "authorized_use_case": "For sending email. Only authorized internal mail servers are allowed to send SMTP traffic to external destinations.",
+      "authorized_source_zones": [ "VLAN-ServerFarm-Production" ],
+      "authorized_destination_zones": [ "Any-External" ],
+      "notes": "Outbound SMTP from workstation VLANs is a strong indicator of a spambot and should be blocked."
+    },
+    {
+      "policy_id": "POL-004",
+      "port_protocol": "UDP/53",
+      "service_name": "DNS",
+      "description": "Domain Name System",
+      "status": "Allowed",
+      "authorized_use_case": "For resolving domain names. All internal clients must use the internal DNS servers (10.0.0.1). Internal DNS servers are allowed to query external servers.",
+      "authorized_source_zones": [ "Any-Internal" ],
+      "authorized_destination_zones": [ "VLAN-ServerFarm-Production", "Any-External" ],
+      "notes": "High volumes of DNS traffic or queries to non-approved servers may indicate DNS tunneling."
+    },
+    {
+      "policy_id": "POL-005",
+      "port_protocol": "TCP/80",
+      "service_name": "HTTP",
+      "description": "Hypertext Transfer Protocol",
+      "status": "Allowed",
+      "authorized_use_case": "Standard web browsing. All outbound HTTP traffic must go through the corporate web proxy. All inbound HTTP to the DMZ is redirected to HTTPS.",
+      "authorized_source_zones": [ "Any" ],
+      "authorized_destination_zones": [ "Any" ],
+      "notes": "Direct-to-IP HTTP connections are considered suspicious."
+    },
+    {
+      "policy_id": "POL-006",
+      "port_protocol": "UDP/88",
+      "service_name": "Kerberos",
+      "description": "Network Authentication Protocol",
+      "status": "Allowed",
+      "authorized_use_case": "Core authentication protocol for Windows Active Directory. Essential for user and computer logons.",
+      "authorized_source_zones": [ "Any-Internal" ],
+      "authorized_destination_zones": [ "VLAN-ServerFarm-Production" ],
+      "notes": "This traffic should never be seen leaving the internal network."
+    },
+    {
+      "policy_id": "POL-007",
+      "port_protocol": "UDP/123",
+      "service_name": "NTP",
+      "description": "Network Time Protocol",
+      "status": "Allowed",
+      "authorized_use_case": "For synchronizing system clocks. All internal devices must sync with the primary domain controller (10.0.0.1).",
+      "authorized_source_zones": [ "Any-Internal" ],
+      "authorized_destination_zones": [ "VLAN-ServerFarm-Production" ],
+      "notes": ""
+    },
+    {
+      "policy_id": "POL-008",
+      "port_protocol": "TCP/443",
+      "service_name": "HTTPS",
+      "description": "HTTP Secure",
+      "status": "Allowed",
+      "authorized_use_case": "Standard secure web browsing and API calls. All outbound HTTPS goes through the web proxy. Inbound HTTPS is allowed to the DMZ.",
+      "authorized_source_zones": [ "Any" ],
+      "authorized_destination_zones": [ "Any" ],
+      "notes": ""
+    },
+    {
+      "policy_id": "POL-009",
+      "port_protocol": "TCP/445",
+      "service_name": "SMB",
+      "description": "Server Message Block",
+      "status": "Restricted",
+      "authorized_use_case": "For accessing Windows file shares and Active Directory group policies.",
+      "authorized_source_zones": [ "VLAN-Workstations-MainOffice", "VLAN-Workstations-HR", "VLAN-ServerFarm-Production" ],
+      "authorized_destination_zones": [ "VLAN-FileServers", "VLAN-ServerFarm-Production" ],
+      "notes": "SMB traffic is strictly forbidden at the network edge (ingress/egress). SMB traffic originating from the DMZ is a critical alert."
+    },
+    {
+      "policy_id": "POL-010",
+      "port_protocol": "TCP/1433",
+      "service_name": "MS-SQL",
+      "description": "Microsoft SQL Server",
+      "status": "Restricted",
+      "authorized_use_case": "Communication between application servers and backend Microsoft SQL databases.",
+      "authorized_source_zones": [ "VLAN-ServerFarm-Production" ],
+      "authorized_destination_zones": [ "VLAN-ServerFarm-Production" ],
+      "notes": "Should only be allowed between specific servers as needed. Not for general workstation access."
+    },
+    {
+      "policy_id": "POL-011",
+      "port_protocol": "TCP/3389",
+      "service_name": "RDP",
+      "description": "Remote Desktop Protocol",
+      "status": "Restricted",
+      "authorized_use_case": "For remote GUI administration of Windows Servers.",
+      "authorized_source_zones": [ "VLAN-IT-Admin-Security" ],
+      "authorized_destination_zones": [ "VLAN-ServerFarm-Production", "VLAN-FileServers" ],
+      "notes": "RDP from the general user population is forbidden. RDP should never be exposed directly to the internet."
+    },
+    {
+      "policy_id": "POL-012",
+      "port_protocol": "UDP/1194",
+      "service_name": "OpenVPN",
+      "description": "VPN Protocol",
+      "status": "Allowed",
+      "authorized_use_case": "Primary protocol for remote user VPN access.",
+      "authorized_source_zones": [ "Any-External" ],
+      "authorized_destination_zones": [ "VLAN-DMZ" ],
+      "notes": "Only the VPN concentrator should be listening on this port."
+    },
+    {
+      "policy_id": "POL-013",
+      "port_protocol": "TCP/8081",
+      "service_name": "Non-Standard HTTP",
+      "description": "Alternate HTTP Port",
+      "status": "Forbidden",
+      "authorized_use_case": "No approved business use case. Often used by malware for C2 communication to bypass basic port filtering.",
+      "authorized_source_zones": [ "None" ],
+      "authorized_destination_zones": [ "None" ],
+      "notes": "Treat any outbound traffic on this port as suspicious and investigate immediately."
+    },
+    {
+      "policy_id": "POL-014",
+      "port_protocol": "TCP/1-65535",
+      "service_name": "Any/All",
+      "description": "Network Scanning",
+      "status": "Restricted",
+      "authorized_use_case": "For vulnerability scanning and network discovery.",
+      "authorized_source_zones": [ "VLAN-IT-Admin-Security", "VLAN-Development" ],
+      "authorized_destination_zones": [ "Any-Internal", "VLAN-Development" ],
+      "notes": "Scanning originating from the IT/Security VLAN is authorized. Unrestricted scanning within the Development VLAN by developers is permitted. All other scanning is considered reconnaissance."
+    }
+  ]
+}

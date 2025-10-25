@@ -1,0 +1,156 @@
+{
+  "dns_logs": [
+    {
+      "timestamp": "2025-10-20T16:29:59Z",
+      "source_ip": "10.0.15.45",
+      "client_hostname": "Server-DevDB01",
+      "query_name": "google.com",
+      "query_type": "A",
+      "response_code": "NOERROR",
+      "dns_server": "10.0.0.1"
+    },
+    {
+      "timestamp": "2025-10-20T16:30:00Z",
+      "source_ip": "10.0.15.45",
+      "client_hostname": "Server-DevDB01",
+      "query_name": "wMWEwOWY2NzI2NDY1MmU2MzYxNzM2ODJlN.data.malicious-exfil.net",
+      "query_type": "A",
+      "response_code": "NOERROR",
+      "dns_server": "104.244.42.1"
+    },
+    {
+      "timestamp": "2025-10-20T16:30:01Z",
+      "source_ip": "10.0.15.45",
+      "client_hostname": "Server-DevDB01",
+      "query_name": "jY2M2ZjZDIwNzQ2ODY1NzM3NDIwNjMy.data.malicious-exfil.net",
+      "query_type": "A",
+      "response_code": "NOERROR",
+      "dns_server": "104.244.42.1"
+    },
+    {
+      "timestamp": "2025-10-20T16:30:02Z",
+      "source_ip": "10.0.15.45",
+      "client_hostname": "Server-DevDB01",
+      "query_name": "NzY2OTY0NjUyMGFzZGYyMDIxMjAyMD.data.malicious-exfil.net",
+      "query_type": "A",
+      "response_code": "NOERROR",
+      "dns_server": "104.244.42.1"
+    },
+    {
+      "timestamp": "2025-10-22T14:45:27Z",
+      "source_ip": "192.168.2.55",
+      "client_hostname": "Laptop-HR05",
+      "query_name": "secure-microsft-login.com",
+      "query_type": "A",
+      "response_code": "NOERROR",
+      "dns_server": "10.0.0.1"
+    },
+    {
+      "timestamp": "2025-10-24T10:00:01Z",
+      "source_ip": "10.0.5.80",
+      "client_hostname": "AppServer-CRM01",
+      "query_name": "api.salesforce.com",
+      "query_type": "A",
+      "response_code": "NOERROR",
+      "dns_server": "10.0.0.1"
+    },
+    {
+      "timestamp": "2025-10-16T23:50:00Z",
+      "source_ip": "10.0.5.23",
+      "client_hostname": "Workstation-Finance03",
+      "query_name": "qakbot-c2-panel-ru.net",
+      "query_type": "A",
+      "response_code": "NOERROR",
+      "dns_server": "10.0.0.1"
+    },
+    {
+      "timestamp": "2025-11-05T12:35:10Z",
+      "source_ip": "192.168.1.101",
+      "client_hostname": "Workstation-Sales21",
+      "query_name": "hotmail.com",
+      "query_type": "MX",
+      "response_code": "NOERROR",
+      "dns_server": "10.0.0.1"
+    }
+  ],
+  "web_proxy_logs": [
+    {
+      "timestamp": "2025-10-16T23:50:01Z",
+      "source_ip": "10.0.5.23",
+      "user_id": "p.davis",
+      "http_method": "CONNECT",
+      "destination_domain": "91.218.114.21:8081",
+      "full_url": "https://91.218.114.21:8081/gate.php",
+      "url_category": "Malware",
+      "action": "Blocked",
+      "bytes_uploaded": 0,
+      "bytes_downloaded": 0,
+      "proxy_server": "proxy-hq-01"
+    },
+    {
+      "timestamp": "2025-10-19T11:05:18Z",
+      "source_ip": "192.168.1.150",
+      "user_id": "m.jones",
+      "http_method": "POST",
+      "destination_domain": "content.dropboxapi.com",
+      "full_url": "https://content.dropboxapi.com/2/files/upload",
+      "url_category": "Cloud Storage",
+      "action": "Allowed",
+      "bytes_uploaded": 1024000,
+      "bytes_downloaded": 256,
+      "proxy_server": "proxy-hq-01"
+    },
+    {
+      "timestamp": "2025-10-22T14:45:28Z",
+      "source_ip": "192.168.2.55",
+      "user_id": "s.adams",
+      "http_method": "GET",
+      "destination_domain": "secure-microsft-login.com",
+      "full_url": "http://secure-microsft-login.com/owa/auth/logon.aspx?url=...&reason=2",
+      "url_category": "Phishing;Newly Registered Domain",
+      "action": "Allowed",
+      "bytes_uploaded": 512,
+      "bytes_downloaded": 12288,
+      "proxy_server": "proxy-hq-01"
+    },
+    {
+      "timestamp": "2025-10-24T10:00:02Z",
+      "source_ip": "10.0.5.80",
+      "user_id": "sql_service",
+      "http_method": "POST",
+      "destination_domain": "api.salesforce.com",
+      "full_url": "https://api.salesforce.com/services/data/v56.0/sobjects/Account/",
+      "url_category": "Business Applications",
+      "action": "Allowed",
+      "bytes_uploaded": 2048,
+      "bytes_downloaded": 1024,
+      "proxy_server": "proxy-serverfarm-01"
+    },
+    {
+      "timestamp": "2025-10-28T04:19:55Z",
+      "source_ip": "10.0.15.45",
+      "user_id": null,
+      "http_method": "CONNECT",
+      "destination_domain": "89.234.157.254:9001",
+      "full_url": "https://89.234.157.254:9001",
+      "url_category": "Anonymizing Proxy;Threat Intelligence Blacklist",
+      "action": "Blocked",
+      "bytes_uploaded": 0,
+      "bytes_downloaded": 0,
+      "proxy_server": "proxy-serverfarm-01"
+    },
+    {
+      "timestamp": "2025-11-03T10:30:00Z",
+      "source_ip": "192.168.1.150",
+      "user_id": "m.jones",
+      "http_method": "GET",
+      "destination_domain": "www.linkedin.com",
+      "full_url": "https://www.linkedin.com/feed/",
+      "url_category": "Social Media",
+      "action": "Allowed",
+      "bytes_uploaded": 4096,
+      "bytes_downloaded": 204800,
+      "proxy_server": "proxy-hq-01"
+    }
+  ]
+}

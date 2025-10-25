@@ -1,0 +1,271 @@
+{
+  "iam_users": [
+    {
+      "username": "s.adams",
+      "full_name": "Sarah Adams",
+      "department": "Sales",
+      "role_title": "Sales Manager, EMEA",
+      "manager": "k.jenkins",
+      "account_status": "Active",
+      "privileged_access": [],
+      "on_call_travel_status": false,
+      "last_password_reset": "2025-08-15"
+    },
+    {
+      "username": "m.jones",
+      "full_name": "Michael Jones",
+      "department": "Marketing",
+      "role_title": "Digital Marketing Specialist",
+      "manager": "l.wong",
+      "account_status": "Active",
+      "privileged_access": [],
+      "on_call_travel_status": false,
+      "last_password_reset": "2025-09-01"
+    },
+    {
+      "username": "p.davis",
+      "full_name": "Patricia Davis",
+      "department": "Finance",
+      "role_title": "Financial Controller",
+      "manager": "r.miller",
+      "account_status": "Active",
+      "privileged_access": [],
+      "on_call_travel_status": false,
+      "last_password_reset": "2025-07-22"
+    },
+    {
+      "username": "j.doe",
+      "full_name": "John Doe",
+      "department": "Operations",
+      "role_title": "Project Manager",
+      "manager": "c.vance",
+      "account_status": "Active",
+      "privileged_access": [],
+      "on_call_travel_status": false,
+      "last_password_reset": "2025-10-03"
+    },
+    {
+      "username": "j.smith",
+      "full_name": "James Smith",
+      "department": "IT Infrastructure",
+      "role_title": "Sr. Systems Administrator",
+      "manager": "d.chen",
+      "account_status": "Active",
+      "privileged_access": [
+        "Domain Admins",
+        "Server Admins",
+        "VMware Admins"
+      ],
+      "on_call_travel_status": true,
+      "last_password_reset": "2025-09-30"
+    },
+    {
+      "username": "d.chen",
+      "full_name": "David Chen",
+      "department": "IT Infrastructure",
+      "role_title": "Director of IT",
+      "manager": "c.vance",
+      "account_status": "Active",
+      "privileged_access": [
+        "Domain Admins"
+      ],
+      "on_call_travel_status": false,
+      "last_password_reset": "2025-09-28"
+    },
+    {
+      "username": "l.wong",
+      "full_name": "Linda Wong",
+      "department": "Marketing",
+      "role_title": "Marketing Lead",
+      "manager": "k.jenkins",
+      "account_status": "Active",
+      "privileged_access": [],
+      "on_call_travel_status": false,
+      "last_password_reset": "2025-06-11"
+    },
+    {
+      "username": "k.jenkins",
+      "full_name": "Kevin Jenkins",
+      "department": "Sales",
+      "role_title": "VP of Sales and Marketing",
+      "manager": "c.vance",
+      "account_status": "Active",
+      "privileged_access": [],
+      "on_call_travel_status": true,
+      "last_password_reset": "2025-08-01"
+    },
+    {
+      "username": "r.miller",
+      "full_name": "Robert Miller",
+      "department": "Finance",
+      "role_title": "Chief Financial Officer",
+      "manager": "c.vance",
+      "account_status": "Active",
+      "privileged_access": [],
+      "on_call_travel_status": false,
+      "last_password_reset": "2025-05-19"
+    },
+    {
+      "username": "c.vance",
+      "full_name": "Catherine Vance",
+      "department": "Executive",
+      "role_title": "Chief Executive Officer",
+      "manager": null,
+      "account_status": "Active",
+      "privileged_access": [],
+      "on_call_travel_status": true,
+      "last_password_reset": "2025-10-01"
+    },
+    {
+      "username": "a.williams",
+      "full_name": "Angela Williams",
+      "department": "Development",
+      "role_title": "Lead Software Developer",
+      "manager": "d.chen",
+      "account_status": "Active",
+      "privileged_access": [
+        "Dev Server Admins"
+      ],
+      "on_call_travel_status": true,
+      "last_password_reset": "2025-10-15"
+    },
+    {
+      "username": "b.taylor",
+      "full_name": "Brian Taylor",
+      "department": "Human Resources",
+      "role_title": "HR Generalist",
+      "manager": "e.harris",
+      "account_status": "Active",
+      "privileged_access": [],
+      "on_call_travel_status": false,
+      "last_password_reset": "2025-09-12"
+    },
+    {
+      "username": "e.harris",
+      "full_name": "Emily Harris",
+      "department": "Human Resources",
+      "role_title": "Director of HR",
+      "manager": "c.vance",
+      "account_status": "Active",
+      "privileged_access": [],
+      "on_call_travel_status": false,
+      "last_password_reset": "2025-04-20"
+    },
+    {
+      "username": "t.clark",
+      "full_name": "Thomas Clark",
+      "department": "IT Infrastructure",
+      "role_title": "Network Engineer",
+      "manager": "d.chen",
+      "account_status": "Active",
+      "privileged_access": [
+        "Network Admins"
+      ],
+      "on_call_travel_status": true,
+      "last_password_reset": "2025-09-30"
+    },
+    {
+      "username": "m.rodriguez",
+      "full_name": "Maria Rodriguez",
+      "department": "Security Operations",
+      "role_title": "Security Analyst",
+      "manager": "g.singh",
+      "account_status": "Active",
+      "privileged_access": [
+        "SIEM Admins"
+      ],
+      "on_call_travel_status": true,
+      "last_password_reset": "2025-10-02"
+    },
+    {
+      "username": "g.singh",
+      "full_name": "Gita Singh",
+      "department": "Security Operations",
+      "role_title": "SOC Manager",
+      "manager": "d.chen",
+      "account_status": "Active",
+      "privileged_access": [
+        "SIEM Admins",
+        "EDR Admins"
+      ],
+      "on_call_travel_status": false,
+      "last_password_reset": "2025-10-02"
+    },
+    {
+      "username": "z.nelson",
+      "full_name": "Zoe Nelson",
+      "department": "Sales",
+      "role_title": "Sales Associate",
+      "manager": "s.adams",
+      "account_status": "On Leave",
+      "privileged_access": [],
+      "on_call_travel_status": false,
+      "last_password_reset": "2025-02-18"
+    },
+    {
+      "username": "f.wright",
+      "full_name": "Frank Wright",
+      "department": "IT Infrastructure",
+      "role_title": "IT Support Technician",
+      "manager": "j.smith",
+      "account_status": "Active",
+      "privileged_access": [
+        "Help Desk Admins"
+      ],
+      "on_call_travel_status": false,
+      "last_password_reset": "2025-08-29"
+    },
+    {
+      "username": "DomainAdmin",
+      "full_name": "Domain Admin Service Account",
+      "department": "IT Infrastructure",
+      "role_title": "Shared Admin Account",
+      "manager": null,
+      "account_status": "Active",
+      "privileged_access": [
+        "Domain Admins"
+      ],
+      "on_call_travel_status": false,
+      "last_password_reset": "2025-09-30",
+      "notes": "Use is restricted to emergency scenarios and automated tasks. All usage must be logged."
+    },
+    {
+      "username": "backup_admin",
+      "full_name": "Backup Service Admin",
+      "department": "IT Infrastructure",
+      "role_title": "Service Account",
+      "manager": null,
+      "account_status": "Active",
+      "privileged_access": [
+        "Domain Admins",
+        "Backup Operators"
+      ],
+      "on_call_travel_status": false,
+      "last_password_reset": "2025-10-30",
+      "notes": "Account created on 2025-10-30 for new backup solution deployment."
+    },
+    {
+      "username": "sql_service",
+      "full_name": "SQL Service Account",
+      "department": "IT Infrastructure",
+      "role_title": "Service Account",
+      "manager": null,
+      "account_status": "Active",
+      "privileged_access": [],
+      "on_call_travel_status": false,
+      "last_password_reset": "2025-01-01"
+    },
+    {
+      "username": "d.hill",
+      "full_name": "Diana Hill",
+      "department": "Marketing",
+      "role_title": "Graphic Designer",
+      "manager": "l.wong",
+      "account_status": "Disabled",
+      "privileged_access": [],
+      "on_call_travel_status": false,
+      "last_password_reset": "2024-11-05",
+      "notes": "Former employee. Account disabled on 2025-09-15."
+    }
+  ]
+}

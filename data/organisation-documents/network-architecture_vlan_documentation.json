@@ -1,0 +1,88 @@
+{
+  "network_vlans": [
+    {
+      "vlan_id": 1,
+      "vlan_name": "Default-Quarantine",
+      "ip_range": "10.0.1.0/24",
+      "description": "Default VLAN for all switch ports. All ports should be moved to a designated VLAN. Any active device in this segment is considered a misconfiguration.",
+      "security_policy_summary": "No access to any resources. All traffic is logged and dropped. Generates an alert if a new device is seen."
+    },
+    {
+      "vlan_id": 10,
+      "vlan_name": "VLAN-Workstations-MainOffice",
+      "ip_range": "192.168.1.0/24",
+      "description": "General corporate user workstations for Sales, Marketing, and Operations at the London HQ.",
+      "security_policy_summary": "Allowed outbound internet access via proxy. Allowed access to Server Farm on ports 443, 1433, 8080. Allowed access to File Servers on port 445. RDP/SSH from this VLAN to servers is forbidden."
+    },
+    {
+      "vlan_id": 15,
+      "vlan_name": "VLAN-Workstations-HR",
+      "ip_range": "192.168.2.0/24",
+      "description": "Restricted VLAN for Human Resources workstations handling sensitive PII.",
+      "security_policy_summary": "Same as Main Office, but with stricter data loss prevention (DLP) rules on outbound traffic. Internet access is limited to whitelisted domains."
+    },
+    {
+      "vlan_id": 40,
+      "vlan_name": "VLAN-IT-Admin-Security",
+      "ip_range": "10.0.10.0/24",
+      "description": "Secure VLAN for IT administrators, privileged access workstations (PAWs), and security tools like vulnerability scanners.",
+      "security_policy_summary": "Highly restricted internet access. Allowed to initiate RDP and SSH to all internal server VLANs. Source for authorized vulnerability scans."
+    },
+    {
+      "vlan_id": 50,
+      "vlan_name": "VLAN-Development",
+      "ip_range": "10.0.15.0/24",
+      "description": "Sandbox environment for developers. Contains staging and test servers.",
+      "security_policy_summary": "Permissive outbound internet access. Intra-VLAN traffic is unrestricted to allow for testing. Access to Production Server VLANs is strictly forbidden, except for read-only access to specific database replicas."
+    },
+    {
+      "vlan_id": 60,
+      "vlan_name": "VLAN-Printers",
+      "ip_range": "10.0.20.0/24",
+      "description": "Network segment for all corporate printers and multi-function devices.",
+      "security_policy_summary": "No internet access allowed. Can only be accessed from workstation VLANs on specific printing-related ports. Should never initiate outbound connections."
+    },
+    {
+      "vlan_id": 70,
+      "vlan_name": "VLAN-Voice-over-IP",
+      "ip_range": "10.0.30.0/24",
+      "description": "Dedicated VLAN for VoIP phones to ensure quality of service (QoS).",
+      "security_policy_summary": "Isolated segment. Can only communicate with the VoIP provider's servers and the internal phone management system. No internet browsing or access to corporate servers."
+    },
+    {
+      "vlan_id": 120,
+      "vlan_name": "VLAN-ServerFarm-Production",
+      "ip_range": "10.0.5.0/24",
+      "description": "Houses all core production application and database servers (CRM, etc.).",
+      "security_policy_summary": "Strictly controlled. No general outbound internet access. Allowed outbound connections only to specific, whitelisted external APIs (e.g., Salesforce, Microsoft Update). Should never initiate connections to workstation VLANs."
+    },
+    {
+      "vlan_id": 150,
+      "vlan_name": "VLAN-FileServers",
+      "ip_range": "10.0.50.0/24",
+      "description": "A dedicated segment within the server farm for the primary file servers.",
+      "security_policy_summary": "No internet access. Only allows inbound SMB/NFS traffic (port 445/2049) from internal workstation and server VLANs. Outbound traffic is denied by default."
+    },
+    {
+      "vlan_id": 200,
+      "vlan_name": "VLAN-DMZ",
+      "ip_range": "203.0.113.0/24",
+      "description": "Demilitarized Zone for public-facing services like the corporate website and Outlook Web Access (OWA).",
+      "security_policy_summary": "Inbound internet traffic is allowed only on TCP/80 and TCP/443. Traffic from the DMZ initiating connections to the internal network is STRICTLY FORBIDDEN, especially on management ports like RDP/SSH or file sharing ports like SMB."
+    },
+    {
+      "vlan_id": 300,
+      "vlan_name": "VLAN-VPN-Users",
+      "ip_range": "10.10.0.0/16",
+      "description": "Logical zone for remote users connected via the corporate VPN.",
+      "security_policy_summary": "Once authenticated, users are treated as if they are on a restricted version of the Main Office VLAN. Access is explicitly defined by rules on the VPN concentrator and internal firewall."
+    },
+    {
+      "vlan_id": 999,
+      "vlan_name": "VLAN-Guest-WiFi",
+      "ip_range": "172.16.99.0/24",
+      "description": "Provides internet access for guests and personal devices. Must be completely isolated from the corporate network.",
+      "security_policy_summary": "Internet access only. All access to internal IP ranges is blocked. Client isolation is enabled to prevent guests from communicating with each other."
+    }
+  ]
+}

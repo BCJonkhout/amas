@@ -1,0 +1,1067 @@
+{
+  "cyber_security_alerts": [
+    {
+      "scenario": "Benign - Windows Update",
+      "description": "A corporate workstation is downloading a standard security update from Microsoft's servers. This is routine, expected, and necessary behavior for maintaining system security.",
+      "malicious": false,
+      "threat_category": "Benign Activity",
+      "confidence": "High",
+      "suggested_action": "No action required. This is expected and legitimate traffic. Correlate with the corporate patching schedule if further verification is needed. Whitelist the source if it generates frequent, unnecessary alerts.",
+      "alert": {
+        "General": {
+          "Date": "15-10-2025",
+          "Time": "09:15:33",
+          "Probe_ID": 18260,
+          "Probe_alias": "Main_Office"
+        },
+        "Alarm": {
+          "Priority": {
+            "Level": 1,
+            "Name": "Informational"
+          },
+          "Category": "Policy",
+          "Alarm_trigger": "Allowed Traffic - Known Service",
+          "Alarm": "Software Update"
+        },
+        "Traffic_information": {
+          "VLAN": 10,
+          "Protocol": "TCP",
+          "Traffic_type": "inbound"
+        },
+        "Initiator": {
+          "IP_address": "20.189.173.1",
+          "Port": 443,
+          "MAC_address": null,
+          "MAC_alias": null
+        },
+        "Responder": {
+          "IP_address": "192.168.1.101",
+          "Port": 51234,
+          "Country": "United States",
+          "Network_(asn)": "Microsoft Corporation"
+        }
+      }
+    },
+    {
+      "scenario": "Malicious - Malware Command & Control (C2) Communication",
+      "description": "A compromised device inside the network is communicating with a known malware command and control (C2) server in Russia. The traffic is using a non-standard port to evade simple firewall rules.",
+      "malicious": true,
+      "threat_category": "Command and Control",
+      "confidence": "High",
+      "suggested_action": "Immediate action required. Isolate the host from the network to prevent lateral movement and further damage. Initiate incident response procedures and begin forensic analysis of the compromised device.",
+      "alert": {
+        "General": {
+          "Date": "16-10-2025",
+          "Time": "23:50:01",
+          "Probe_ID": 18261,
+          "Probe_alias": "Server_Farm"
+        },
+        "Alarm": {
+          "Priority": {
+            "Level": 9,
+            "Name": "Critical"
+          },
+          "Category": "Threat Intelligence",
+          "Alarm_trigger": "Connection to known C2 server",
+          "Alarm": "Malware Beacon"
+        },
+        "Traffic_information": {
+          "VLAN": 120,
+          "Protocol": "UDP",
+          "Traffic_type": "outbound"
+        },
+        "Initiator": {
+          "IP_address": "10.0.5.23",
+          "Port": 62109,
+          "MAC_address": "00:1B:44:11:3A:B7",
+          "MAC_alias": "Workstation-Finance03"
+        },
+        "Responder": {
+          "IP_address": "91.218.114.21",
+          "Port": 8081,
+          "Country": "Russia",
+          "Network_(asn)": "REG.RU"
+        }
+      }
+    },
+    {
+      "scenario": "Suspicious - External Port Scan",
+      "description": "An external IP address is rapidly attempting to connect to multiple ports on a public-facing web server. This is a common reconnaissance technique used by attackers to find open ports and vulnerable services.",
+      "malicious": true,
+      "threat_category": "Reconnaissance",
+      "confidence": "High",
+      "suggested_action": "Block the source IP address at the network edge firewall. Review firewall rules for the target server to ensure only necessary ports are exposed. Monitor for further activity from this source or related IP blocks.",
+      "alert": {
+        "General": {
+          "Date": "18-10-2025",
+          "Time": "03:12:45",
+          "Probe_ID": 18262,
+          "Probe_alias": "DMZ_Firewall"
+        },
+        "Alarm": {
+          "Priority": {
+            "Level": 7,
+            "Name": "High"
+          },
+          "Category": "Reconnaissance",
+          "Alarm_trigger": "Multiple port connections from single source in 1 min",
+          "Alarm": "Port Scan Detected"
+        },
+        "Traffic_information": {
+          "VLAN": 200,
+          "Protocol": "TCP",
+          "Traffic_type": "inbound"
+        },
+        "Initiator": {
+          "IP_address": "198.51.100.5",
+          "Port": null,
+          "MAC_address": null,
+          "MAC_alias": null
+        },
+        "Responder": {
+          "IP_address": "203.0.113.10",
+          "Port": "1-1024",
+          "Country": "China",
+          "Network_(asn)": "Tencent Cloud"
+        }
+      }
+    },
+    {
+      "scenario": "Benign - Cloud Storage Sync",
+      "description": "An employee's laptop is syncing files with the company's officially sanctioned Dropbox account. This is normal business activity for file sharing and backup.",
+      "malicious": false,
+      "threat_category": "Benign Activity",
+      "confidence": "High",
+      "suggested_action": "No action required. Verify that Dropbox is an approved cloud service provider. Monitor for unusually large uploads which could indicate unsanctioned data exfiltration.",
+      "alert": {
+        "General": {
+          "Date": "19-10-2025",
+          "Time": "11:05:18",
+          "Probe_ID": 18263,
+          "Probe_alias": "Main_Office"
+        },
+        "Alarm": {
+          "Priority": {
+            "Level": 2,
+            "Name": "Informational"
+          },
+          "Category": "Policy",
+          "Alarm_trigger": "Traffic to approved cloud service",
+          "Alarm": "Cloud Storage Usage"
+        },
+        "Traffic_information": {
+          "VLAN": 10,
+          "Protocol": "TCP",
+          "Traffic_type": "outbound"
+        },
+        "Initiator": {
+          "IP_address": "192.168.1.150",
+          "Port": 54321,
+          "MAC_address": "F8:E4:3B:9A:0C:1D",
+          "MAC_alias": "Laptop-Marketing01"
+        },
+        "Responder": {
+          "IP_address": "162.125.6.18",
+          "Port": 443,
+          "Country": "United States",
+          "Network_(asn)": "Dropbox Inc."
+        }
+      }
+    },
+    {
+      "scenario": "Malicious - Data Exfiltration via DNS Tunneling",
+      "description": "A compromised device is sending an unusually high volume of DNS requests to an external server. The query names are long and randomized, indicating they are being used to encode and sneak data out of the network, bypassing standard firewalls.",
+      "malicious": true,
+      "threat_category": "Exfiltration",
+      "confidence": "High",
+      "suggested_action": "Immediate action required. Isolate the host from the network. Block the destination domain/IP at the DNS server or firewall. Analyze DNS logs to determine the extent of the exfiltration and initiate incident response.",
+      "alert": {
+        "General": {
+          "Date": "20-10-2025",
+          "Time": "16:30:00",
+          "Probe_ID": 18264,
+          "Probe_alias": "DNS_Sensor"
+        },
+        "Alarm": {
+          "Priority": {
+            "Level": 10,
+            "Name": "Critical"
+          },
+          "Category": "Exfiltration",
+          "Alarm_trigger": "Anomalous DNS query volume and length",
+          "Alarm": "Potential DNS Tunneling"
+        },
+        "Traffic_information": {
+          "VLAN": 50,
+          "Protocol": "UDP",
+          "Traffic_type": "outbound"
+        },
+        "Initiator": {
+          "IP_address": "10.0.15.45",
+          "Port": 53,
+          "MAC_address": "A0:99:9B:01:23:45",
+          "MAC_alias": "Server-DevDB01"
+        },
+        "Responder": {
+          "IP_address": "104.244.42.1",
+          "Port": 53,
+          "Country": "Germany",
+          "Network_(asn)": "DigitalOcean"
+        }
+      }
+    },
+    {
+      "scenario": "Benign - Remote Employee VPN Access",
+      "description": "An employee who is traveling for business connects to the corporate VPN from a hotel in Japan to access internal resources. This triggers a geofence alert due to the unusual location.",
+      "malicious": false,
+      "threat_category": "Benign Activity",
+      "confidence": "Medium",
+      "suggested_action": "Verify the user's identity and travel schedule with their manager or HR. If the user's activity is expected, document the event and close the alert. If suspicious, enforce multi-factor authentication and temporarily suspend the account.",
+      "alert": {
+        "General": {
+          "Date": "21-10-2025",
+          "Time": "01:20:11",
+          "Probe_ID": 18265,
+          "Probe_alias": "VPN_Concentrator"
+        },
+        "Alarm": {
+          "Priority": {
+            "Level": 3,
+            "Name": "Low"
+          },
+          "Category": "Access",
+          "Alarm_trigger": "Successful VPN login from foreign country",
+          "Alarm": "Geofence - VPN Login"
+        },
+        "Traffic_information": {
+          "VLAN": 300,
+          "Protocol": "UDP",
+          "Traffic_type": "inbound"
+        },
+        "Initiator": {
+          "IP_address": "210.142.160.11",
+          "Port": 1194,
+          "MAC_address": null,
+          "MAC_alias": null
+        },
+        "Responder": {
+          "IP_address": "203.0.113.50",
+          "Port": 1194,
+          "Country": "Japan",
+          "Network_(asn)": "NTT Communications"
+        }
+      }
+    },
+    {
+      "scenario": "Malicious - Phishing Link Clicked",
+      "description": "An employee clicked a link in a phishing email, and their machine is attempting to connect to a recently registered domain known for hosting credential theft pages. The use of a newly registered domain (NRD) is a strong indicator of malicious intent.",
+      "malicious": true,
+      "threat_category": "Initial Access",
+      "confidence": "High",
+      "suggested_action": "Isolate the host immediately to prevent malware execution or credential submission. Reset the user's password. Scan the device for malware. Block the destination domain across the enterprise.",
+      "alert": {
+        "General": {
+          "Date": "22-10-2025",
+          "Time": "14:45:28",
+          "Probe_ID": 18266,
+          "Probe_alias": "Web_Proxy"
+        },
+        "Alarm": {
+          "Priority": {
+            "Level": 8,
+            "Name": "High"
+          },
+          "Category": "Threat Intelligence",
+          "Alarm_trigger": "Connection to newly registered domain (NRD)",
+          "Alarm": "Phishing Site Visit"
+        },
+        "Traffic_information": {
+          "VLAN": 15,
+          "Protocol": "TCP",
+          "Traffic_type": "outbound"
+        },
+        "Initiator": {
+          "IP_address": "192.168.2.55",
+          "Port": 58901,
+          "MAC_address": "E4:B9:7A:3F:8D:6C",
+          "MAC_alias": "Laptop-HR05"
+        },
+        "Responder": {
+          "IP_address": "172.67.186.130",
+          "Port": 80,
+          "Country": "United States",
+          "Network_(asn)": "Cloudflare"
+        }
+      }
+    },
+    {
+      "scenario": "Suspicious - Internal Port Scan (Lateral Movement)",
+      "description": "One machine inside the network is scanning another internal machine (a database server) for open ports. This is highly suspicious and could indicate an attacker attempting to move laterally after an initial compromise.",
+      "malicious": true,
+      "threat_category": "Lateral Movement",
+      "confidence": "High",
+      "suggested_action": "Investigate the source host immediately as it may be compromised. Isolate the source host and perform a forensic analysis. Review access logs on the destination server for any successful connections.",
+      "alert": {
+        "General": {
+          "Date": "23-10-2025",
+          "Time": "18:00:50",
+          "Probe_ID": 18267,
+          "Probe_alias": "Internal_Firewall"
+        },
+        "Alarm": {
+          "Priority": {
+            "Level": 7,
+            "Name": "High"
+          },
+          "Category": "Reconnaissance",
+          "Alarm_trigger": "Internal-to-Internal Port Scan",
+          "Alarm": "Lateral Movement"
+        },
+        "Traffic_information": {
+          "VLAN": 50,
+          "Protocol": "TCP",
+          "Traffic_type": "internal"
+        },
+        "Initiator": {
+          "IP_address": "10.0.15.101",
+          "Port": null,
+          "MAC_address": "00:1B:44:11:3A:B7",
+          "MAC_alias": "Workstation-Finance03"
+        },
+        "Responder": {
+          "IP_address": "10.0.15.45",
+          "Port": "1-65535",
+          "Country": null,
+          "Network_(asn)": "Internal"
+        }
+      }
+    },
+    {
+      "scenario": "Benign - API Call to SaaS Platform",
+      "description": "An application server is making a routine, authorized API call to Salesforce to synchronize customer data. This is expected behavior for an application integrated with a third-party SaaS platform.",
+      "malicious": false,
+      "threat_category": "Benign Activity",
+      "confidence": "High",
+      "suggested_action": "No action required. This is expected traffic for an application integrated with Salesforce. Monitor API call volume for anomalies that could indicate a compromised API key.",
+      "alert": {
+        "General": {
+          "Date": "24-10-2025",
+          "Time": "10:00:00",
+          "Probe_ID": 18268,
+          "Probe_alias": "Server_Farm_Egress"
+        },
+        "Alarm": {
+          "Priority": {
+            "Level": 1,
+            "Name": "Informational"
+          },
+          "Category": "Policy",
+          "Alarm_trigger": "Allowed API Traffic",
+          "Alarm": "SaaS API Usage"
+        },
+        "Traffic_information": {
+          "VLAN": 120,
+          "Protocol": "TCP",
+          "Traffic_type": "outbound"
+        },
+        "Initiator": {
+          "IP_address": "10.0.5.80",
+          "Port": 49872,
+          "MAC_address": "C0:3F:D5:0A:1B:2C",
+          "MAC_alias": "AppServer-CRM01"
+        },
+        "Responder": {
+          "IP_address": "96.43.148.8",
+          "Port": 443,
+          "Country": "United States",
+          "Network_(asn)": "Salesforce.com"
+        }
+      }
+    },
+    {
+      "scenario": "Malicious - Brute Force Login Attempt (SSH)",
+      "description": "A single external IP is attempting to log in to a public-facing Linux server via SSH hundreds of times in a few minutes. This is a clear indication of a password guessing (brute force) attack.",
+      "malicious": true,
+      "threat_category": "Initial Access",
+      "confidence": "High",
+      "suggested_action": "Block the source IP address at the firewall. Ensure that SSH access is restricted to known IPs and that password-based authentication is disabled in favor of key-based authentication. Review logs for any successful logins from the source.",
+      "alert": {
+        "General": {
+          "Date": "25-10-2025",
+          "Time": "05:40:15",
+          "Probe_ID": 18269,
+          "Probe_alias": "DMZ_Firewall"
+        },
+        "Alarm": {
+          "Priority": {
+            "Level": 8,
+            "Name": "High"
+          },
+          "Category": "Access",
+          "Alarm_trigger": "Excessive failed SSH logins from single source",
+          "Alarm": "SSH Brute Force"
+        },
+        "Traffic_information": {
+          "VLAN": 200,
+          "Protocol": "TCP",
+          "Traffic_type": "inbound"
+        },
+        "Initiator": {
+          "IP_address": "212.192.241.114",
+          "Port": null,
+          "MAC_address": null,
+          "MAC_alias": null
+        },
+        "Responder": {
+          "IP_address": "203.0.113.15",
+          "Port": 22,
+          "Country": "Netherlands",
+          "Network_(asn)": "OVH SAS"
+        }
+      }
+    },
+    {
+      "scenario": "Malicious - PowerShell Fileless Malware Execution",
+      "description": "A PowerShell process was launched with a command to download and execute a script directly into memory from a suspicious, non-corporate domain (pastebin-like site). This is a common technique for fileless malware to avoid detection by traditional antivirus.",
+      "malicious": true,
+      "threat_category": "Execution",
+      "confidence": "High",
+      "suggested_action": "Immediately isolate the host. Kill the malicious PowerShell process. Use memory forensics to analyze the payload. Reset user credentials as the script may have harvested them. Block the destination domain.",
+      "alert": {
+        "General": {
+          "Date": "26-10-2025",
+          "Time": "11:14:09",
+          "Probe_ID": 21001,
+          "Probe_alias": "EDR-Agent-HR05"
+        },
+        "Alarm": {
+          "Priority": { "Level": 9, "Name": "Critical" },
+          "Category": "Host-Based Detection",
+          "Alarm_trigger": "Powershell launched with web download and execute flags",
+          "Alarm": "Fileless Malware Attempt"
+        },
+        "Traffic_information": {
+          "VLAN": 15,
+          "Protocol": "TCP",
+          "Traffic_type": "outbound"
+        },
+        "Initiator": {
+          "IP_address": "192.168.2.55",
+          "Port": 60123,
+          "MAC_address": "E4:B9:7A:3F:8D:6C",
+          "MAC_alias": "Laptop-HR05"
+        },
+        "Responder": {
+          "IP_address": "185.125.190.57",
+          "Port": 443,
+          "Country": "Lithuania",
+          "Network_(asn)": "Hostinger International Limited"
+        }
+      }
+    },
+    {
+      "scenario": "Malicious - Unexpected Outbound SMB Traffic",
+      "description": "A public-facing web server in the DMZ initiated an SMB (port 445) connection to an internal domain controller. Web servers should never initiate SMB connections inwards; this is a strong indicator of an attacker moving laterally after compromising the web server.",
+      "malicious": true,
+      "threat_category": "Lateral Movement",
+      "confidence": "High",
+      "suggested_action": "Isolate the web server immediately. Block all SMB traffic originating from the DMZ. Investigate the web server for signs of compromise (webshells, vulnerable plugins). Analyze domain controller logs for related suspicious access attempts.",
+      "alert": {
+        "General": {
+          "Date": "26-10-2025",
+          "Time": "21:33:00",
+          "Probe_ID": 18270,
+          "Probe_alias": "Internal_Firewall"
+        },
+        "Alarm": {
+          "Priority": { "Level": 10, "Name": "Critical" },
+          "Category": "Policy Violation",
+          "Alarm_trigger": "SMB traffic from DMZ to Internal Core",
+          "Alarm": "Anomalous Internal Traffic"
+        },
+        "Traffic_information": {
+          "VLAN": 200,
+          "Protocol": "TCP",
+          "Traffic_type": "internal"
+        },
+        "Initiator": {
+          "IP_address": "203.0.113.10",
+          "Port": 59876,
+          "MAC_address": "00:0A:95:9D:68:16",
+          "MAC_alias": "WebServer-Public01"
+        },
+        "Responder": {
+          "IP_address": "10.0.0.1",
+          "Port": 445,
+          "Country": null,
+          "Network_(asn)": "Internal"
+        }
+      }
+    },
+    {
+      "scenario": "Malicious - Credential Dumping from LSASS",
+      "description": "An unusual process ('procdump64.exe') accessed the memory of the Local Security Authority Subsystem Service (LSASS) on a domain controller. This is a classic technique for dumping system credentials, including password hashes, for offline cracking.",
+      "malicious": true,
+      "threat_category": "Credential Access",
+      "confidence": "High",
+      "suggested_action": "Assume widespread credential compromise. Initiate enterprise-wide password reset for all users and services. Isolate the domain controller and perform forensic analysis. Hunt for other compromised systems using the attacker's tools.",
+      "alert": {
+        "General": {
+          "Date": "27-10-2025",
+          "Time": "02:05:18",
+          "Probe_ID": 21002,
+          "Probe_alias": "EDR-Agent-DC01"
+        },
+        "Alarm": {
+          "Priority": { "Level": 10, "Name": "Critical" },
+          "Category": "Host-Based Detection",
+          "Alarm_trigger": "Process accessed LSASS memory",
+          "Alarm": "Credential Dumping"
+        },
+        "Traffic_information": { "VLAN": null, "Protocol": null, "Traffic_type": "host" },
+        "Initiator": {
+          "IP_address": "10.0.0.1",
+          "Process": "procdump64.exe",
+          "MAC_address": "00:50:56:A1:01:01",
+          "MAC_alias": "DomainController-Primary"
+        },
+        "Responder": { "IP_address": "10.0.0.1", "Process": "lsass.exe", "Country": null, "Network_(asn)": "Internal" }
+      }
+    },
+    {
+      "scenario": "Suspicious - 'Impossible Travel' VPN Login",
+      "description": "A user successfully logged into the corporate network via VPN from the main office IP, and then logged in again from an IP in Brazil just 15 minutes later. This physical travel is impossible, suggesting a compromised account.",
+      "malicious": true,
+      "threat_category": "Credential Access",
+      "confidence": "High",
+      "suggested_action": "Immediately suspend the user account and terminate all active sessions. Contact the user through a trusted channel (e.g., phone call) to verify their activity. Enforce multi-factor authentication if not already in place.",
+      "alert": {
+        "General": {
+          "Date": "27-10-2025",
+          "Time": "16:40:00",
+          "Probe_ID": 31001,
+          "Probe_alias": "SIEM-Correlation-Engine"
+        },
+        "Alarm": {
+          "Priority": { "Level": 8, "Name": "High" },
+          "Category": "Access",
+          "Alarm_trigger": "Logins from distant geo-locations in short time",
+          "Alarm": "Impossible Travel Detected"
+        },
+        "Traffic_information": { "VLAN": null, "Protocol": "Log", "Traffic_type": "authentication" },
+        "Initiator": { "User": "j.doe", "IP_address": "190.15.22.81", "MAC_address": null, "MAC_alias": null },
+        "Responder": { "IP_address": "203.0.113.50", "Service": "VPN", "Country": "Brazil", "Network_(asn)": "Telefonica Brasil S.A." }
+      }
+    },
+    {
+      "scenario": "Malicious - Traffic to TOR Exit Node",
+      "description": "A server in the development environment initiated a connection to an IP address known to be a Tor exit node. Legitimate corporate servers should not be communicating with the Tor network; this is often used to hide malicious command and control traffic.",
+      "malicious": true,
+      "threat_category": "Command and Control",
+      "confidence": "High",
+      "suggested_action": "Isolate the host. Block all traffic to and from the Tor network at the firewall. Investigate the server for compromise and identify the process that initiated the connection.",
+      "alert": {
+        "General": {
+          "Date": "28-10-2025",
+          "Time": "04:19:55",
+          "Probe_ID": 18271,
+          "Probe_alias": "Server_Farm_Egress"
+        },
+        "Alarm": {
+          "Priority": { "Level": 8, "Name": "High" },
+          "Category": "Threat Intelligence",
+          "Alarm_trigger": "Connection to known TOR node",
+          "Alarm": "TOR Communication"
+        },
+        "Traffic_information": { "VLAN": 50, "Protocol": "TCP", "Traffic_type": "outbound" },
+        "Initiator": {
+          "IP_address": "10.0.15.45",
+          "Port": 55432,
+          "MAC_address": "A0:99:9B:01:23:45",
+          "MAC_alias": "Server-DevDB01"
+        },
+        "Responder": {
+          "IP_address": "89.234.157.254",
+          "Port": 9001,
+          "Country": "France",
+          "Network_(asn)": "OVH SAS"
+        }
+      }
+    },
+    {
+      "scenario": "Malicious - SQL Injection Attempt",
+      "description": "The Web Application Firewall (WAF) detected and blocked an inbound web request containing a classic SQL injection payload ('1' OR '1'='1'). This is an attempt to bypass authentication or extract data from the web application's database.",
+      "malicious": true,
+      "threat_category": "Initial Access",
+      "confidence": "High",
+      "suggested_action": "Block the source IP address. While the WAF blocked this attempt, the web application should be reviewed for SQL injection vulnerabilities by the development team. Analyze other logs from the source for further attack attempts.",
+      "alert": {
+        "General": {
+          "Date": "28-10-2025",
+          "Time": "13:01:12",
+          "Probe_ID": 41001,
+          "Probe_alias": "WAF"
+        },
+        "Alarm": {
+          "Priority": { "Level": 7, "Name": "High" },
+          "Category": "Web Application Attack",
+          "Alarm_trigger": "SQL injection signature detected in URL parameter",
+          "Alarm": "SQLi Detected"
+        },
+        "Traffic_information": { "VLAN": 200, "Protocol": "TCP", "Traffic_type": "inbound" },
+        "Initiator": { "IP_address": "45.146.165.48", "Port": 49871, "MAC_address": null, "MAC_alias": null },
+        "Responder": {
+          "IP_address": "203.0.113.10",
+          "Port": 443,
+          "Country": "Russia",
+          "Network_(asn)": "PQ.Hosting"
+        }
+      }
+    },
+    {
+      "scenario": "Malicious - Ransomware Activity Detected",
+      "description": "A high rate of file modifications and renames (adding a '.crypt' extension) was detected on a central file server, coupled with the creation of a 'ransom_note.txt' file. This is indicative of an active ransomware infection.",
+      "malicious": true,
+      "threat_category": "Impact",
+      "confidence": "High",
+      "suggested_action": "Execute ransomware incident response plan. Isolate the file server and the source host that initiated the encryption. Disconnect backups from the network to prevent their encryption. Do NOT pay the ransom. Begin restoration from clean backups.",
+      "alert": {
+        "General": {
+          "Date": "29-10-2025",
+          "Time": "10:25:00",
+          "Probe_ID": 21003,
+          "Probe_alias": "FIM-Agent-FileServer01"
+        },
+        "Alarm": {
+          "Priority": { "Level": 10, "Name": "Critical" },
+          "Category": "Host-Based Detection",
+          "Alarm_trigger": "High-volume file rename activity and ransom note creation",
+          "Alarm": "Ransomware Detected"
+        },
+        "Traffic_information": { "VLAN": 150, "Protocol": "SMB", "Traffic_type": "internal" },
+        "Initiator": {
+          "IP_address": "192.168.1.150",
+          "User": "m.jones",
+          "MAC_address": "F8:E4:3B:9A:0C:1D",
+          "MAC_alias": "Laptop-Marketing01"
+        },
+        "Responder": {
+          "IP_address": "10.0.50.10",
+          "Hostname": "FileServer01",
+          "Country": null,
+          "Network_(asn)": "Internal"
+        }
+      }
+    },
+    {
+      "scenario": "Suspicious - Successful Login after Brute Force",
+      "description": "An external IP address failed to log in to the OWA portal 112 times before a successful login was recorded for a user account. This indicates a likely successful password spray or brute force attack.",
+      "malicious": true,
+      "threat_category": "Initial Access",
+      "confidence": "High",
+      "suggested_action": "Immediately suspend the user account and terminate their OWA session. Reset the user's password. Block the source IP. Investigate the user's mailbox for signs of compromise, such as new forwarding rules or mass email deletion.",
+      "alert": {
+        "General": {
+          "Date": "29-10-2025",
+          "Time": "15:10:45",
+          "Probe_ID": 31002,
+          "Probe_alias": "SIEM-Correlation-Engine"
+        },
+        "Alarm": {
+          "Priority": { "Level": 8, "Name": "High" },
+          "Category": "Access",
+          "Alarm_trigger": "Successful login after >100 failures from single IP",
+          "Alarm": "Brute Force Success"
+        },
+        "Traffic_information": { "VLAN": null, "Protocol": "Log", "Traffic_type": "authentication" },
+        "Initiator": { "IP_address": "116.109.13.205", "User": "s.adams", "MAC_address": null, "MAC_alias": null },
+        "Responder": {
+          "IP_address": "203.0.113.25",
+          "Service": "OWA",
+          "Country": "Vietnam",
+          "Network_(asn)": "Viettel Group"
+        }
+      }
+    },
+    {
+      "scenario": "Malicious - Windows Event Log Cleared",
+      "description": "The Windows Security Event Log on a critical server was cleared by an administrator account. This is a common tactic used by attackers to cover their tracks after gaining privileged access.",
+      "malicious": true,
+      "threat_category": "Defense Evasion",
+      "confidence": "Medium",
+      "suggested_action": "Investigate immediately. Correlate with administrator activity logs. If the action was not part of a planned maintenance task, assume the administrator account is compromised and the server is breached. Begin incident response.",
+      "alert": {
+        "General": {
+          "Date": "30-10-2025",
+          "Time": "03:45:10",
+          "Probe_ID": 31003,
+          "Probe_alias": "Log-Collector"
+        },
+        "Alarm": {
+          "Priority": { "Level": 7, "Name": "High" },
+          "Category": "Host-Based Detection",
+          "Alarm_trigger": "Windows Event Log Cleared (Event ID 1102)",
+          "Alarm": "Audit Log Tampering"
+        },
+        "Traffic_information": { "VLAN": null, "Protocol": "Log", "Traffic_type": "host" },
+        "Initiator": {
+          "IP_address": "10.0.5.23",
+          "User": "DomainAdmin",
+          "MAC_address": "00:1B:44:11:3A:B7",
+          "MAC_alias": "Workstation-Finance03"
+        },
+        "Responder": {
+          "IP_address": "10.0.15.45",
+          "Hostname": "Server-DevDB01",
+          "Country": null,
+          "Network_(asn)": "Internal"
+        }
+      }
+    },
+    {
+      "scenario": "Suspicious - New Admin Account Creation",
+      "description": "A new user account was created and immediately added to the 'Domain Admins' group. This action occurred outside of the normal service desk process and outside of business hours.",
+      "malicious": true,
+      "threat_category": "Persistence",
+      "confidence": "High",
+      "suggested_action": "Immediately disable the newly created account. Investigate which administrator account created it and verify the legitimacy of the action. If unverified, assume the source administrator account is compromised and initiate password reset.",
+      "alert": {
+        "General": {
+          "Date": "30-10-2025",
+          "Time": "22:00:15",
+          "Probe_ID": 31004,
+          "Probe_alias": "ActiveDirectory-Auditor"
+        },
+        "Alarm": {
+          "Priority": { "Level": 8, "Name": "High" },
+          "Category": "Identity",
+          "Alarm_trigger": "New account added to privileged group",
+          "Alarm": "Privileged Account Creation"
+        },
+        "Traffic_information": { "VLAN": null, "Protocol": "Log", "Traffic_type": "authentication" },
+        "Initiator": { "User": "j.smith", "IP_address": "10.0.0.1", "MAC_address": null, "MAC_alias": null },
+        "Responder": { "User": "backup_admin", "Group": "Domain Admins", "Country": null, "Network_(asn)": "Internal" }
+      }
+    },
+    {
+      "scenario": "Benign - Vulnerability Scan",
+      "description": "The official internal vulnerability scanner is performing its weekly authenticated scan against the server farm. This generates a high volume of connection alerts but is expected and authorized activity.",
+      "malicious": false,
+      "threat_category": "Benign Activity",
+      "confidence": "High",
+      "suggested_action": "No action required. This is a scheduled security scan. Verify the source IP belongs to the vulnerability management platform. Suppress alerts from this source during the scan window.",
+      "alert": {
+        "General": {
+          "Date": "31-10-2025",
+          "Time": "02:15:00",
+          "Probe_ID": 18272,
+          "Probe_alias": "Internal_Firewall"
+        },
+        "Alarm": {
+          "Priority": { "Level": 1, "Name": "Informational" },
+          "Category": "Reconnaissance",
+          "Alarm_trigger": "High connection rate from internal scanner",
+          "Alarm": "Authorized Vulnerability Scan"
+        },
+        "Traffic_information": { "VLAN": 40, "Protocol": "TCP", "Traffic_type": "internal" },
+        "Initiator": {
+          "IP_address": "10.0.10.100",
+          "Port": null,
+          "MAC_address": "00:50:56:A1:FE:DC",
+          "MAC_alias": "VulnerabilityScanner"
+        },
+        "Responder": { "IP_address": "10.0.5.0/24", "Port": "1-65535", "Country": null, "Network_(asn)": "Internal" }
+      }
+    },
+    {
+      "scenario": "Malicious - Phishing Attachment Spawns PowerShell",
+      "description": "A user opened a Microsoft Word document ('invoice.docm') which contained a malicious macro. The macro then executed a PowerShell command, a common TTP for initial compromise via spearphishing.",
+      "malicious": true,
+      "threat_category": "Initial Access",
+      "confidence": "High",
+      "suggested_action": "Isolate the host immediately. Delete the phishing email from the user's inbox and search for similar emails sent to other users. Reset the user's password. Analyze the PowerShell command to determine the next stage of the attack.",
+      "alert": {
+        "General": {
+          "Date": "01-11-2025",
+          "Time": "09:55:21",
+          "Probe_ID": 21004,
+          "Probe_alias": "EDR-Agent-Finance03"
+        },
+        "Alarm": {
+          "Priority": { "Level": 9, "Name": "Critical" },
+          "Category": "Host-Based Detection",
+          "Alarm_trigger": "WINWORD.EXE spawned powershell.exe",
+          "Alarm": "Malicious Document Execution"
+        },
+        "Traffic_information": { "VLAN": null, "Protocol": null, "Traffic_type": "host" },
+        "Initiator": {
+          "IP_address": "10.0.5.23",
+          "ParentProcess": "WINWORD.EXE",
+          "MAC_address": "00:1B:44:11:3A:B7",
+          "MAC_alias": "Workstation-Finance03"
+        },
+        "Responder": { "Process": "powershell.exe", "CommandLine": "...", "Country": null, "Network_(asn)": "Internal" }
+      }
+    },
+    {
+      "scenario": "Suspicious - Large ICMP Packets (Tunneling)",
+      "description": "Sustained ICMP (ping) traffic with unusually large packet sizes is flowing from an internal server to an external IP. This could be an attempt to exfiltrate data via an ICMP tunnel, which can bypass some firewalls.",
+      "malicious": true,
+      "threat_category": "Exfiltration",
+      "confidence": "Medium",
+      "suggested_action": "Perform a packet capture on the traffic to inspect the ICMP data payload for recognizable data structures. Block outbound ICMP traffic from the source host. Investigate the source host for malware that performs ICMP tunneling.",
+      "alert": {
+        "General": {
+          "Date": "01-11-2025",
+          "Time": "14:20:30",
+          "Probe_ID": 18273,
+          "Probe_alias": "Server_Farm_Egress"
+        },
+        "Alarm": {
+          "Priority": { "Level": 6, "Name": "Medium" },
+          "Category": "Exfiltration",
+          "Alarm_trigger": "Sustained large ICMP echo packets",
+          "Alarm": "Potential ICMP Tunneling"
+        },
+        "Traffic_information": { "VLAN": 120, "Protocol": "ICMP", "Traffic_type": "outbound" },
+        "Initiator": {
+          "IP_address": "10.0.5.80",
+          "Port": null,
+          "MAC_address": "C0:3F:D5:0A:1B:2C",
+          "MAC_alias": "AppServer-CRM01"
+        },
+        "Responder": {
+          "IP_address": "192.241.220.108",
+          "Port": null,
+          "Country": "United States",
+          "Network_(asn)": "DigitalOcean"
+        }
+      }
+    },
+    {
+      "scenario": "Malicious - Process Masquerading",
+      "description": "A process named 'svchost.exe', a common Windows system process, is running from a non-standard directory (C:\\Users\\Public\\). The legitimate svchost.exe only runs from C:\\Windows\\System32\\. This is a malware persistence and evasion technique.",
+      "malicious": true,
+      "threat_category": "Defense Evasion",
+      "confidence": "High",
+      "suggested_action": "Isolate the host. Terminate the malicious process. Submit a hash of the executable to a malware analysis sandbox (e.g., VirusTotal). Begin forensic investigation to determine how the malware was placed on the system.",
+      "alert": {
+        "General": {
+          "Date": "02-11-2025",
+          "Time": "08:12:44",
+          "Probe_ID": 21005,
+          "Probe_alias": "EDR-Agent-Marketing01"
+        },
+        "Alarm": {
+          "Priority": { "Level": 8, "Name": "High" },
+          "Category": "Host-Based Detection",
+          "Alarm_trigger": "System process running from invalid path",
+          "Alarm": "Process Masquerading"
+        },
+        "Traffic_information": { "VLAN": null, "Protocol": null, "Traffic_type": "host" },
+        "Initiator": {
+          "IP_address": "192.168.1.150",
+          "Process": "svchost.exe",
+          "MAC_address": "F8:E4:3B:9A:0C:1D",
+          "MAC_alias": "Laptop-Marketing01"
+        },
+        "Responder": { "Path": "C:\\Users\\Public\\svchost.exe", "Country": null, "Network_(asn)": "Internal" }
+      }
+    },
+    {
+      "scenario": "Suspicious - Unauthorized USB Device",
+      "description": "A USB device with a vendor ID not on the corporate approved list was connected to a workstation in the Finance department. This could be an attempt to introduce malware (e.g., BadUSB) or exfiltrate data.",
+      "malicious": false,
+      "threat_category": "Policy Violation",
+      "confidence": "Medium",
+      "suggested_action": "If policy dictates, automatically block the device. Dispatch a security officer or IT support to the workstation to identify the device. Remind the user of the removable media policy. Scan the workstation for malware.",
+      "alert": {
+        "General": {
+          "Date": "02-11-2025",
+          "Time": "11:30:05",
+          "Probe_ID": 21006,
+          "Probe_alias": "DLP-Agent-Finance03"
+        },
+        "Alarm": {
+          "Priority": { "Level": 4, "Name": "Low" },
+          "Category": "Policy Violation",
+          "Alarm_trigger": "Unapproved USB Vendor ID detected",
+          "Alarm": "Unauthorized Hardware"
+        },
+        "Traffic_information": { "VLAN": null, "Protocol": null, "Traffic_type": "host" },
+        "Initiator": {
+          "IP_address": "10.0.5.23",
+          "User": "p.davis",
+          "MAC_address": "00:1B:44:11:3A:B7",
+          "MAC_alias": "Workstation-Finance03"
+        },
+        "Responder": { "Device": "USBSTOR\\...\\RubberDucky", "VendorID": "1dd7", "Country": null, "Network_(asn)": "Internal" }
+      }
+    },
+    {
+      "scenario": "Malicious - Outbound FTP Data Transfer",
+      "description": "A workstation established an unencrypted FTP connection to an unknown external server and uploaded a large (500MB) file. Corporate policy forbids the use of FTP for data transfer, and the file size is suspicious.",
+      "malicious": true,
+      "threat_category": "Exfiltration",
+      "confidence": "High",
+      "suggested_action": "Isolate the host. Block the destination IP at the firewall. Investigate the workstation to identify the file that was transferred and the process that initiated the connection. This could be an insider threat or a compromised machine.",
+      "alert": {
+        "General": {
+          "Date": "03-11-2025",
+          "Time": "16:01:38",
+          "Probe_ID": 18274,
+          "Probe_alias": "Main_Office_Egress"
+        },
+        "Alarm": {
+          "Priority": { "Level": 8, "Name": "High" },
+          "Category": "Policy Violation",
+          "Alarm_trigger": "Outbound FTP traffic detected",
+          "Alarm": "Potential Data Exfiltration via FTP"
+        },
+        "Traffic_information": { "VLAN": 15, "Protocol": "TCP", "Traffic_type": "outbound" },
+        "Initiator": {
+          "IP_address": "192.168.2.55",
+          "Port": 62111,
+          "MAC_address": "E4:B9:7A:3F:8D:6C",
+          "MAC_alias": "Laptop-HR05"
+        },
+        "Responder": {
+          "IP_address": "5.101.155.200",
+          "Port": 21,
+          "Country": "Russia",
+          "Network_(asn)": "TimeWeb"
+        }
+      }
+    },
+    {
+      "scenario": "Benign - Developer Using Nmap on Staging",
+      "description": "A developer is using the Nmap tool to scan a server within the designated development VLAN. The scan is originating from a known developer workstation. This is likely legitimate activity to check for open ports on an application they are building.",
+      "malicious": false,
+      "threat_category": "Benign Activity",
+      "confidence": "High",
+      "suggested_action": "No action required, but document the event. Verify with the development team lead that this activity is expected. Consider creating a policy to suppress 'reconnaissance' alerts that are confined to the development VLAN.",
+      "alert": {
+        "General": {
+          "Date": "03-11-2025",
+          "Time": "17:30:11",
+          "Probe_ID": 18275,
+          "Probe_alias": "Internal_Firewall"
+        },
+        "Alarm": {
+          "Priority": { "Level": 2, "Name": "Informational" },
+          "Category": "Reconnaissance",
+          "Alarm_trigger": "Internal Port Scan",
+          "Alarm": "Developer Scan Activity"
+        },
+        "Traffic_information": { "VLAN": 50, "Protocol": "TCP", "Traffic_type": "internal" },
+        "Initiator": {
+          "IP_address": "10.0.15.105",
+          "Port": null,
+          "MAC_address": "B8:8A:60:DE:C5:A1",
+          "MAC_alias": "Workstation-Dev07"
+        },
+        "Responder": { "IP_address": "10.0.15.50", "Port": "1-65535", "Country": null, "Network_(asn)": "Internal" }
+      }
+    },
+    {
+      "scenario": "Benign - Admin RDP to Server",
+      "description": "A network administrator is connecting via RDP from a designated IT management workstation to a server in the server farm. This is standard administrative procedure for server maintenance.",
+      "malicious": false,
+      "threat_category": "Benign Activity",
+      "confidence": "High",
+      "suggested_action": "No action required. This is expected and authorized administrative access. Log the event for audit purposes.",
+      "alert": {
+        "General": {
+          "Date": "04-11-2025",
+          "Time": "10:10:10",
+          "Probe_ID": 18276,
+          "Probe_alias": "Internal_Firewall"
+        },
+        "Alarm": {
+          "Priority": { "Level": 1, "Name": "Informational" },
+          "Category": "Access",
+          "Alarm_trigger": "RDP connection from IT VLAN to Server VLAN",
+          "Alarm": "Administrative RDP Session"
+        },
+        "Traffic_information": { "VLAN": 40, "Protocol": "TCP", "Traffic_type": "internal" },
+        "Initiator": {
+          "IP_address": "10.0.10.15",
+          "Port": 51000,
+          "MAC_address": "00:50:56:A1:AD:01",
+          "MAC_alias": "Workstation-ITAdmin01"
+        },
+        "Responder": {
+          "IP_address": "10.0.5.80",
+          "Port": 3389,
+          "Country": null,
+          "Network_(asn)": "Internal"
+        }
+      }
+    },
+    {
+      "scenario": "Malicious - New Service Creation for Persistence",
+      "description": "A new Windows service ('WindowsUpdateSvc') was created on a workstation. The service executable points to a suspicious file in the user's AppData directory. This is a common method for malware to achieve persistence across reboots.",
+      "malicious": true,
+      "threat_category": "Persistence",
+      "confidence": "High",
+      "suggested_action": "Isolate the host. Disable and delete the malicious service. Delete the associated executable file. Investigate the host to determine the initial infection vector.",
+      "alert": {
+        "General": {
+          "Date": "04-11-2025",
+          "Time": "15:05:25",
+          "Probe_ID": 21007,
+          "Probe_alias": "EDR-Agent-HR05"
+        },
+        "Alarm": {
+          "Priority": { "Level": 8, "Name": "High" },
+          "Category": "Host-Based Detection",
+          "Alarm_trigger": "New service created with executable in user profile",
+          "Alarm": "Suspicious Service Creation"
+        },
+        "Traffic_information": { "VLAN": null, "Protocol": null, "Traffic_type": "host" },
+        "Initiator": {
+          "IP_address": "192.168.2.55",
+          "User": "SYSTEM",
+          "MAC_address": "E4:B9:7A:3F:8D:6C",
+          "MAC_alias": "Laptop-HR05"
+        },
+        "Responder": {
+          "Service": "WindowsUpdateSvc",
+          "ImagePath": "C:\\Users\\...\\wupdate.exe",
+          "Country": null,
+          "Network_(asn)": "Internal"
+        }
+      }
+    },
+    {
+      "scenario": "Suspicious - High Volume of Outbound SMTP Traffic",
+      "description": "A workstation that is not a mail server has sent over 1000 emails to external domains in the last hour via SMTP (Port 25). This machine is likely compromised and being used as part of a spambot network.",
+      "malicious": true,
+      "threat_category": "Impact",
+      "confidence": "High",
+      "suggested_action": "Isolate the host from the network. Block outbound SMTP traffic from all non-mail server IPs at the firewall. Scan the host for spam-sending malware. Check if the company's external IP has been added to any spam blacklists.",
+      "alert": {
+        "General": {
+          "Date": "05-11-2025",
+          "Time": "12:40:00",
+          "Probe_ID": 18277,
+          "Probe_alias": "Main_Office_Egress"
+        },
+        "Alarm": {
+          "Priority": { "Level": 7, "Name": "High" },
+          "Category": "Policy Violation",
+          "Alarm_trigger": "Anomalous outbound SMTP volume from workstation",
+          "Alarm": "Potential Spambot"
+        },
+        "Traffic_information": { "VLAN": 10, "Protocol": "TCP", "Traffic_type": "outbound" },
+        "Initiator": {
+          "IP_address": "192.168.1.101",
+          "Port": null,
+          "MAC_address": "1A:2B:3C:4D:5E:6F",
+          "MAC_alias": "Workstation-Sales21"
+        },
+        "Responder": { "IP_address": "Multiple", "Port": 25, "Country": "Multiple", "Network_(asn)": "Multiple" }
+      }
+    }
+  ]
+}

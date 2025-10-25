@@ -1,0 +1,128 @@
+{
+  "ueba_profiles": [
+    {
+      "profile_id": "UEBA-USER-j.doe",
+      "entity_type": "User",
+      "entity_name": "j.doe",
+      "profile_maturity": "Mature",
+      "risk_score": 15,
+      "behavioral_baseline": {
+        "typical_logon_hours": [ "08:00-18:00 UTC" ],
+        "common_source_countries": [ "United Kingdom" ],
+        "common_source_ips": [ "192.168.1.0/24", "203.0.113.50" ],
+        "frequently_accessed_servers": [ "10.0.50.10", "10.0.5.80" ],
+        "normal_data_egress_volume_mb_per_day": 50,
+        "privileged_account_use": "Never"
+      },
+      "last_updated": "2025-10-27T12:00:00Z"
+    },
+    {
+      "profile_id": "UEBA-HOST-WebServer-Public01",
+      "entity_type": "Host",
+      "entity_name": "WebServer-Public01",
+      "profile_maturity": "Mature",
+      "risk_score": 25,
+      "behavioral_baseline": {
+        "normal_outbound_ports": [ "TCP/443", "UDP/53" ],
+        "normal_inbound_ports": [ "TCP/443", "TCP/80" ],
+        "common_destination_countries": [ "United States", "Ireland", "Germany" ],
+        "normal_outbound_traffic_volume_gb_per_day": 5,
+        "common_processes_executed": [ "apache2", "sshd", "rsyslogd", "fail2ban-server" ],
+        "outbound_smb_observed": "Never"
+      },
+      "last_updated": "2025-10-26T18:00:00Z"
+    },
+    {
+      "profile_id": "UEBA-HOST-Workstation-Finance03",
+      "entity_type": "Host",
+      "entity_name": "Workstation-Finance03",
+      "profile_maturity": "Mature",
+      "risk_score": 10,
+      "behavioral_baseline": {
+        "normal_outbound_ports": [ "TCP/443", "UDP/53", "TCP/445", "TCP/1433" ],
+        "common_destination_countries": [ "United States", "Ireland" ],
+        "normal_outbound_traffic_volume_gb_per_day": 1,
+        "common_processes_executed": [ "OUTLOOK.EXE", "EXCEL.EXE", "chrome.exe", "powershell.exe" ],
+        "powershell_baseline": "Executes simple, unsigned scripts from local drive. Never connects to external IPs.",
+        "outbound_smb_observed": "To 10.0.50.10 only"
+      },
+      "last_updated": "2025-10-26T10:00:00Z"
+    },
+    {
+      "profile_id": "UEBA-USER-j.smith",
+      "entity_type": "User",
+      "entity_name": "j.smith",
+      "profile_maturity": "Mature",
+      "risk_score": 40,
+      "behavioral_baseline": {
+        "typical_logon_hours": [ "07:00-19:00 UTC", "22:00-03:00 UTC" ],
+        "common_source_countries": [ "United Kingdom" ],
+        "common_source_ips": [ "10.0.10.15" ],
+        "frequently_accessed_servers": [ "10.0.0.1", "10.0.5.80", "10.0.50.10", "203.0.113.50" ],
+        "privileged_account_use": "Frequent (Domain Admins)",
+        "active_directory_activity": "Frequent creation of user accounts, infrequent creation of admin accounts (avg 1 per quarter)."
+      },
+      "last_updated": "2025-10-30T20:00:00Z"
+    },
+    {
+      "profile_id": "UEBA-HOST-Laptop-Marketing01",
+      "entity_type": "Host",
+      "entity_name": "Laptop-Marketing01",
+      "profile_maturity": "Mature",
+      "risk_score": 5,
+      "behavioral_baseline": {
+        "normal_outbound_ports": [ "TCP/443", "UDP/53", "TCP/445" ],
+        "common_destination_countries": [ "United States" ],
+        "normal_outbound_traffic_volume_gb_per_day": 2,
+        "common_processes_executed": [ "chrome.exe", "photoshop.exe", "Dropbox.exe" ],
+        "file_server_access_pattern": "High volume of read/writes to Marketing share on 10.0.50.10. No history of rapid file renaming."
+      },
+      "last_updated": "2025-10-29T09:00:00Z"
+    },
+    {
+      "profile_id": "UEBA-HOST-DomainController-Primary",
+      "entity_type": "Host",
+      "entity_name": "DomainController-Primary",
+      "profile_maturity": "Mature",
+      "risk_score": 50,
+      "behavioral_baseline": {
+        "normal_outbound_ports": [ "UDP/53", "UDP/123" ],
+        "normal_inbound_ports": [ "UDP/53", "TCP/88", "TCP/135", "TCP/445", "TCP/389" ],
+        "common_processes_executed": [ "lsass.exe", "dns.exe", "dfssvc.exe", "ntfrs.exe" ],
+        "lsass_memory_access": "Only ever accessed by System, services.exe, wininit.exe. Never accessed by procdump64.exe.",
+        "event_log_clearing_observed": "Never"
+      },
+      "last_updated": "2025-10-27T01:00:00Z"
+    },
+    {
+      "profile_id": "UEBA-USER-a.williams",
+      "entity_type": "User",
+      "entity_name": "a.williams",
+      "profile_maturity": "Learning",
+      "risk_score": 20,
+      "behavioral_baseline": {
+        "typical_logon_hours": [ "09:00-20:00 UTC" ],
+        "common_source_countries": [ "United Kingdom" ],
+        "frequently_accessed_servers": [ "10.0.15.45", "10.0.15.50" ],
+        "network_tool_usage": "Frequent use of nmap, ssh, netcat within VLAN 50."
+      },
+      "last_updated": "2025-11-03T17:00:00Z"
+    },
+    {
+      "profile_id": "UEBA-HOST-Server-DevDB01",
+      "entity_type": "Host",
+      "entity_name": "Server-DevDB01",
+      "profile_maturity": "Mature",
+      "risk_score": 15,
+      "behavioral_baseline": {
+        "normal_outbound_ports": [ "TCP/3306" ],
+        "normal_inbound_ports": [ "TCP/22", "TCP/3306" ],
+        "common_destination_countries": [ "None" ],
+        "normal_outbound_traffic_volume_gb_per_day": 0.1,
+        "common_processes_executed": [ "mysqld", "sshd" ],
+        "dns_query_volume": "Low (avg < 100 queries per hour)"
+      },
+      "last_updated": "2025-10-20T15:00:00Z"
+    }
+  ]
+}

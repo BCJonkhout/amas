@@ -1,0 +1,84 @@
+{
+  "analysis_metadata": {
+    "analysis_id": "ANA-20251021-012011-e6a7b8",
+    "alert_id": "18265",
+    "analysis_timestamp": "2025-10-21T01:21:02Z",
+    "analysis_engine_version": "2.1.0",
+    "status": "Completed"
+  },
+  "triage_summary": {
+    "final_verdict": "Benign True Positive",
+    "calculated_severity": "Informational",
+    "confidence_score": 100,
+    "triage_summary_text": "A geofence alert was triggered by a successful VPN login from Japan. Correlation with IAM data shows the user is a traveling executive ('k.jenkins'), making this expected and authorized business activity.",
+    "mitre_attack_mapping": []
+  },
+  "evidence_locker": {
+    "correlated_cmdb_assets": [
+      {
+        "ci_id": "CI00103",
+        "hostname": "VPN-Concentrator-HQ",
+        "ip_address": "203.0.113.50",
+        "function": "SSL VPN endpoint for remote corporate access.",
+        "business_criticality": "High",
+        "status": "Production"
+      }
+    ],
+    "correlated_iam_users": [
+      {
+        "username": "k.jenkins",
+        "full_name": "Kevin Jenkins",
+        "department": "Sales",
+        "role_title": "VP of Sales and Marketing",
+        "account_status": "Active",
+        "on_call_travel_status": true
+      }
+    ],
+    "policy_violations": [
+      {
+        "policy_id": "POL-012",
+        "violation_description": "No violation. Inbound OpenVPN traffic (UDP/1194) from external sources to the DMZ is explicitly allowed by policy."
+      }
+    ],
+    "threat_intelligence_matches": [
+      {
+        "finding_summary": "The source IP '210.142.160.11' was not found in the threat intelligence database."
+      }
+    ],
+    "correlated_log_evidence": {
+      "vpn_authentication_logs": [
+        {
+          "timestamp": "2025-10-21T01:20:10Z",
+          "server": "VPN-Concentrator-HQ",
+          "event_type": "Authentication",
+          "source_ip": "210.142.160.11",
+          "user": "k.jenkins",
+          "status": "Login Successful",
+          "mfa_status": "MFA Verified"
+        }
+      ]
+    },
+    "vulnerability_status": {
+      "finding_summary": "No open critical or high vulnerabilities are present on the 'VPN-Concentrator-HQ' asset."
+    },
+    "ueba_anomalies": {
+      "anomaly_summary": "The login from Japan is a geographical anomaly. However, this is contextually explained and overridden by the user's authorized travel status in the IAM database. The login is therefore considered benign."
+    }
+  },
+  "course_of_action": {
+    "recommended_playbook_id": null,
+    "playbook_name": null,
+    "automated_or_one_click_actions": [
+      {
+        "action": "CLOSE_ALERT",
+        "target": "18265",
+        "reason": "Classified as Benign True Positive. Confirmed authorized user activity."
+      }
+    ],
+    "next_steps_for_analyst": [
+      "No immediate action required.",
+      "Consider creating a short-term (e.g., 7-day) alert suppression rule for successful logins from Japan for user 'k.jenkins' to reduce noise while they are traveling.",
+      "Document the event in the ticketing system for audit purposes."
+    ]
+  }
+}
