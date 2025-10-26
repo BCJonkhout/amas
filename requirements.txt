@@ -1,0 +1,8 @@
+crewai>=1.2.0
+crewai-tools>=0.2.6
+mcp[fastmcp]>=0.1.0
+langchain-google-vertexai>=0.1.0
+langchain-google-genai>=0.1.0
+langchain-openai>=0.1.0
+python-dotenv>=1.0.0
+google-cloud-aiplatform>=1.63.0

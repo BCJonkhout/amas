@@ -1,182 +1,144 @@
-# 1. Imports
-from crewai import Agent, Task, Crew, Process
-from crewai_tools import BaseTool
+"""Command-line entry point for running AMAS investigations end-to-end."""
+
+from __future__ import annotations
+
+import argparse
 import json
-from langchain_google_genai import ChatGoogleGenerativeAI  # Example LLM
+import os
+from pathlib import Path
+from typing import Any, Dict, List
+
+from crewai.llm import LLM
+
+try:
+    from .workflow import run_alert_investigation
+    from .security_data import SecurityDataRepository
+except ImportError:  # pragma: no cover - allows running as a script
+    from workflow import run_alert_investigation  # type: ignore[no-redef]
+    from security_data import SecurityDataRepository  # type: ignore[no-redef]
 
 
-# ----------------------------------------------------------------------------
-# 2. Model Context Protocol Implementation: The "Security Data API" Toolset
-# ----------------------------------------------------------------------------
-# This class acts as a structured gateway to all our JSON data sources.
-# It simulates a set of well-defined API endpoints, fulfilling the "Model Context Protocol"
-# by providing a consistent and predictable way for agents to query data.
+def _ensure_google_credentials() -> None:
+    if os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
+        return
 
-class SecurityDataAPIs(BaseTool):
-    name: str = "Security Data API Gateway"
-    description: str = "A unified toolset for querying all internal enterprise security and IT data sources."
-
-    def __init__(self):
-        # Load all our knowledge bases into memory on initialization
-        self.cmdb = self._load_json('cmdb.json')
-        self.iam = self._load_json('iam_hr_database.json')
-        self.vlan_docs = self._load_json('network_architecture_vlan_documentation.json')
-        self.service_policy = self._load_json('approved_port_service_usage_policy.json')
-        self.threat_intel = self._load_json('threat_intelligence.json')
-        self.ueba_profiles = self._load_json('user_entity_behaviour_analytics.json')
-        self.edr_logs = self._load_json('endpoint_security_logs.json')
-        self.vuln_scans = self._load_json('vulnerability_scan_database.json')
-        self.proxy_dns_logs = self._load_json('web_proxy_dns_logs.json')
-        self.playbooks = self._load_json('incident_response_playbooks.json')
-
-    def _load_json(self, filepath):
-        with open(filepath, 'r') as f:
-            return json.load(f)
-
-    # Each method below is a "tool" the LLM can call. The docstring is critical
-    # as it tells the LLM what the tool does and what inputs it needs.
-
-    def _run(self, query: str, entity_type: str):
-        """
-        The main query router for the API Gateway. Use this to find information.
-        Example: query="192.168.2.55", entity_type="cmdb"
-        """
-        if entity_type == "cmdb":
-            # Search logic for CMDB by IP, hostname, etc.
-            return [asset for asset in self.cmdb['cmdb_assets'] if
-                    query in [asset.get('ip_address'), asset.get('hostname')]]
-        elif entity_type == "iam":
-            # Search logic for IAM by username
-            return [user for user in self.iam['iam_users'] if query == user.get('username')]
-        elif entity_type == "threat_intel":
-            # Search logic for Threat Intel by IP, domain, hash
-            return [ioc for ioc in self.threat_intel['threat_intelligence_indicators'] if
-                    query == ioc.get('indicator_value')]
-        # ... Add similar query logic for all other data sources ...
-        else:
-            return "Error: Unknown entity_type. Must be one of [cmdb, iam, threat_intel, ...]"
+    base_dir = Path(__file__).resolve().parents[1] / "secrets"
+    for candidate in (
+        base_dir / "gcp" / "service-account.json",
+        base_dir / "gcp.json",
+    ):
+        if candidate.is_file():
+            os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = str(candidate)
+            return
 
 
-# ----------------------------------------------------------------------------
-# 3. Agent Definitions
-# ----------------------------------------------------------------------------
-# Instantiate the single toolset that all agents will use.
-security_api_tools = SecurityDataAPIs()
-
-# Define the LLM to be used by all agents
-llm = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0.2)
-
-# Control Tower Agent Definition
-control_tower_agent = Agent(
-    role="Control Tower Agent",
-    goal="Efficiently triage, dispatch, and manage incoming security alerts for deep analysis by specialized agents.",
-    backstory=(
-        "You are the central orchestrator of a Multi-Agent System for Cyber Incident Investigations. "
-        "Your function is to act as an intelligent router, receiving alerts, performing rapid initial triage, "
-        "and spawning an Issue Analysis Agent to conduct the full investigation. You track all parallel investigations and "
-        "synthesize the final results for the human SOC team."
-    ),
-    llm=llm,
-    tools=[security_api_tools],  # Has access to CMDB for initial triage.
-    verbose=True
-)
-
-# Issue Analysis Agent Definition
-issue_analysis_agent = Agent(
-    role="Issue Analysis Agent",
-    goal="Conduct a deep, rapid, and context-aware investigation into a single security alert, producing a definitive, evidence-backed conclusion and an actionable response plan.",
-    backstory=(
-        "You are a specialized and autonomous investigator. Your purpose is to receive a single task from the "
-        "Control Tower and use all available data sources to enrich the alert. You must connect disparate data points, "
-        "determine the root cause, assess the impact, and formulate a clear verdict. Your reasoning must be transparent and your output must be a complete JSON report."
-    ),
-    llm=llm,
-    tools=[security_api_tools],  # Has full access to all data sources.
-    verbose=True
-)
-
-# Overall Analysis Agent Definition (Note: In a real system, this would run periodically or in a separate process)
-overall_analysis_agent = Agent(
-    role="Overall Analysis Agent",
-    goal="Analyze aggregated incident data over time to identify strategic patterns, emerging trends, and systemic risks.",
-    backstory=(
-        "You are a strategic intelligence synthesizer. You do not investigate single incidents. Instead, you consume the results of all completed investigations to see the big picture. "
-        "Your goal is to convert incident data into organization-level intelligence, providing risk forecasts and long-term security recommendations."
-    ),
-    llm=llm,
-    tools=[security_api_tools],  # Access to CMDB/IAM to enrich trend data.
-    verbose=True
-)
-
-# ----------------------------------------------------------------------------
-# 4. Task Definitions
-# ----------------------------------------------------------------------------
-
-# This task simulates the Control Tower's initial triage and handoff.
-control_tower_task = Task(
-    description=(
-        "You have received the following security alert: {alert_json}\n\n"
-        "1. Perform an initial triage by querying the CMDB for the primary asset's business criticality.\n"
-        "2. Based on the criticality, formulate a precise and detailed investigation plan for the Issue Analysis Agent.\n"
-        "3. Your final output must be this investigation plan, which will be handed to the next agent."
-    ),
-    expected_output="A clear, step-by-step investigation plan for the Issue Analysis Agent.",
-    agent=control_tower_agent
-)
-
-# This task is the core of the investigation, performed by the Issue Analysis Agent.
-issue_analysis_task = Task(
-    description=(
-        "Using the investigation plan provided by the Control Tower, you must now conduct a full investigation of the alert.\n"
-        "Follow the plan meticulously, using your available tools to query all relevant data sources.\n"
-        "You MUST correlate information from CMDB, IAM, Threat Intel, EDR, Vulnerability Scans, and all other logs.\n"
-        "Your final output MUST be a single, complete JSON object that strictly adheres to the 'Automated Analysis Report' schema. "
-        "This includes the final verdict, calculated severity, an evidence locker, and a course of action with a recommended playbook."
-    ),
-    expected_output="The final, complete 'Automated Analysis Report' in JSON format.",
-    agent=issue_analysis_agent,
-    context=[control_tower_task]  # This task depends on the output of the control tower's task.
-)
-
-
-# ----------------------------------------------------------------------------
-# 5. Crew Definition and Execution
-# ----------------------------------------------------------------------------
-
-def run_investigation_crew(alert_to_investigate):
-    # For a single incident, we form a crew with the Control Tower and Issue Analysis agents.
-    # The Overall Analysis agent would be part of a separate, long-running 'Strategic Crew'.
-    incident_crew = Crew(
-        agents=[control_tower_agent, issue_analysis_agent],
-        tasks=[control_tower_task, issue_analysis_task],
-        process=Process.sequential,  # The process is sequential: Triage -> Investigate
-        verbose=2
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Run the AMAS security investigation workflow.")
+    parser.add_argument(
+        "--alerts-file",
+        type=Path,
+        default=Path(__file__).resolve().parents[1] / "data" / "alerts.json",
+        help="Path to the alerts JSON catalogue.",
     )
+    parser.add_argument(
+        "--scenario",
+        type=str,
+        default=None,
+        help="Select an alert by scenario name.",
+    )
+    parser.add_argument(
+        "--index",
+        type=int,
+        default=0,
+        help="Select an alert by index if --scenario is not provided.",
+    )
+    parser.add_argument(
+        "--list",
+        action="store_true",
+        help="List available alert scenarios and exit.",
+    )
+    parser.add_argument(
+        "--llm-provider",
+        type=str,
+        default=os.environ.get("AMAS_LLM_PROVIDER", "vertex"),
+        help="LLM provider to use (vertex|google-genai|openai). Can also be set via AMAS_LLM_PROVIDER env var.",
+    )
+    return parser.parse_args()
 
-    # Kick off the investigation
-    result = incident_crew.kickoff(inputs={'alert_json': json.dumps(alert_to_investigate)})
-    return result
+
+def load_alerts(alerts_file: Path) -> List[Dict[str, Any]]:
+    if not alerts_file.is_file():
+        raise FileNotFoundError(f"Alerts file not found: {alerts_file}")
+
+    with alerts_file.open("r", encoding="utf-8") as handle:
+        payload = json.load(handle)
+
+    alerts = payload.get("cyber_security_alerts")
+    if not isinstance(alerts, list):
+        raise ValueError("Unexpected alerts JSON format. Expected 'cyber_security_alerts' list.")
+    return alerts
 
 
-# --- Main Execution Block ---
+def choose_alert(alerts: List[Dict[str, Any]], scenario: str | None, index: int) -> Dict[str, Any]:
+    if scenario:
+        for alert in alerts:
+            if alert.get("scenario", "").lower() == scenario.lower():
+                return alert
+        raise ValueError(f"Scenario '{scenario}' not found in alerts catalogue.")
+    if index < 0 or index >= len(alerts):
+        raise IndexError(f"Alert index {index} out of range. Available range: 0-{len(alerts) - 1}.")
+    return alerts[index]
+
+
+def create_llm(provider: str):
+    provider = provider.lower()
+    temperature = float(os.environ.get("AMAS_LLM_TEMPERATURE", "0.8"))
+
+    if provider in {"vertex", "google", "google-vertex"}:
+        _ensure_google_credentials()
+        model_name = os.environ.get("AMAS_VERTEX_MODEL", "gemini-2.5-flash")
+        project = os.environ.get("AMAS_VERTEX_PROJECT") or os.environ.get("GOOGLE_CLOUD_PROJECT")
+        location = os.environ.get("AMAS_VERTEX_LOCATION", "europe-west4")
+
+        if not model_name.startswith("gemini/"):
+            model_name = f"gemini/{model_name}"
+
+        llm_kwargs: Dict[str, Any] = {"temperature": temperature, "location": location}
+        if project:
+            llm_kwargs["project"] = project
+        return LLM(model=model_name, **llm_kwargs)
+
+    if provider in {"google-genai", "gemini"}:
+        model_name = os.environ.get("AMAS_GOOGLE_MODEL", "gemini-2.5-flash")
+        if not model_name.startswith("gemini/"):
+            model_name = f"gemini/{model_name}"
+        return LLM(model=model_name, temperature=temperature)
+
+    if provider == "openai":
+        model_name = os.environ.get("AMAS_OPENAI_MODEL", "gpt-4o-mini")
+        return LLM(model=model_name, temperature=temperature)
+
+    raise ValueError(f"Unsupported LLM provider '{provider}'. Expected 'vertex', 'google-genai', or 'openai'.")
+
+
+def main() -> None:
+    args = parse_args()
+    alerts = load_alerts(args.alerts_file)
+
+    if args.list:
+        for idx, alert in enumerate(alerts):
+            scenario = alert.get("scenario", f"Alert #{idx}")
+            probe_id = alert.get("alert", {}).get("General", {}).get("Probe_ID")
+            print(f"{idx:02d}: {scenario} (Probe_ID={probe_id})")
+        return
+
+    alert = choose_alert(alerts, scenario=args.scenario, index=args.index)
+    llm = create_llm(args.llm_provider)
+    repository = SecurityDataRepository()
+
+    result = run_alert_investigation(alert_payload=alert, llm=llm, repository=repository)
+    print(result)
+
+
 if __name__ == "__main__":
-    print("## Initializing Multi-Agent Cyber Investigation System ##")
-
-    # Load a sample alert to investigate (e.g., the Unauthorized USB Device alert)
-    sample_alert = {
-        "alert_id": "21006",
-        "description": "An unauthorized USB device was connected to a workstation in the Finance department.",
-        "details": {
-            "hostname": "Workstation-Finance03",
-            "user": "p.davis",
-            "device_name": "USBSTOR\\...\\RubberDucky",
-            "vendor_id": "1dd7"
-        }
-    }
-
-    # Run the crew to get the final analysis report
-    final_report = run_investigation_crew(sample_alert)
-
-    print("\n\n## Investigation Complete ##")
-    print("## Final Automated Analysis Report: ##")
-    print(final_report)
+    main()

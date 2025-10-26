@@ -1,3 +1,6 @@
 secrets
 .idea
 .venv
+.env
+
+data/output/scenarios
